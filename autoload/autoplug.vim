@@ -2,7 +2,7 @@
 " Author: lymslive
 " Description: VimL class frame
 " Create: 2017-08-10
-" Modify: 2017-08-10
+" Modify: 2017-08-11
 
 if exists('s:load') && !exists('g:DEBUG')
     finish
@@ -41,7 +41,14 @@ endfunction "}}}
 " complete: 
 function! autoplug#complete(ArgLead, CmdLine, CursorPos) abort "{{{
     let l:lsGlob = glob(s:path . '/' . a:ArgLead . '*/', 0, 1)
-    return map(l:lsGlob, 'fnamemodify(v:val, ":p:h:t")')
+    let l:lsGlob= map(l:lsGlob, 'fnamemodify(v:val, ":p:h:t")')
+    if s:path !=# expand('~/.vim/autoload')
+        let l:path = expand('~/.vim/autoload')
+        let l:lsMore = glob(l:path . '/' . a:ArgLead . '*/', 0, 1)
+        let l:lsMore = map(l:lsMore, 'fnamemodify(v:val, ":p:h:t")')
+        call extend(l:lsGlob, l:lsMore)
+    endif
+    return l:lsGlob
 endfunction "}}}
 
 command! -nargs=? -complete=customlist,autoplug#complete PI call autoplug#load(<f-args>)

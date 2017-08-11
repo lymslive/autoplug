@@ -50,7 +50,7 @@ $ git clone https://github.com/lymslive/autoplug.git
 ```
 
 ```vim
-:pack autoplug
+:packadd autoplug
 :call autoplug#load()
 ```
 
@@ -63,4 +63,41 @@ $ git clone https://github.com/lymslive/autoplug.git
 :PI zzz
 ```
 
-目前，`:PI` 命令支持有限补全。
+目前，`:PI` 命令支持有限补全，可补全本库及 `~/.vim` 目录下 `autoload/` 的子目
+录名称。但是对于已输入的 `xxx` 参数，按 vim 的自动加载机制，会在所有 `rtp` 路
+径下搜索。
+
+故在极简模式下，只要将本库的 `autoload/autoplug.vim` 文件下载丢到
+`~/.vim/autolaod/` 目录下，应该就能工作了。
+
+## 缘满
+
+### 保持独立的插件仓库
+
+原来写的这几个插件，功能略复杂，迁移麻烦，故按原址不动：
+
+* [vimloo](https://github.com/lymslive/vimloo) 面向对象化的 viml 脚本实现
+* [vnote](https://github.com/lymslive/vnote) 用 vim 写日记记笔记
+* [StartVim](https://github.com/lymslive/StartVim) 用不同的姿式启动 vim
+
+### 本仓库包含的功能插件列表
+
++ [edvsplit](autoload/edvsplit) 双窗口编辑模式
++ [usetabpg](autoload/usetabpg) 使用多标签页工作
++ [microcmd](autoload/microcmd) 简易实用的微命令集
++ [warptext](autoload/warptext) 修饰包含括号等小功能
++ [qcmotion](autoload/qcmotion) 重映射 q 键用于快速移动
++ [spacebar](autoload/spacebar) 空格键的一些映射
++ [gamemaze](autoload/gamemaze) 在vim下玩玩迷宫游戏(demo)
+
+
+### 计划或正在撸的插件
+
+- [csviewer](autoload/csviewer) cvs 数据文件查看与编辑插件
+- [vtmder](autoload/vtmder) 受 TC 与 MC 启发的文件管理插件
+
+## 缘灭
+
+以后若想再撸 vim 插件，没特别原因，应该不会额外开小仓库了。清爽。唯一不爽的是
+`autoload/` 目录下的 `#` 函数全名有点长。
+
