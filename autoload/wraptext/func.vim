@@ -10,7 +10,7 @@ let s:scriploaded = 1
 let s:funcloaded = 1
 " Wrap: 修饰总函数，用于 mapping 调用 " {{{1
 " 参数：prefix、postfix：前缀后缀；  mode:：指示映射模式
-function! Wrap#Wrap(prefix, postfix, mode) range " {{{
+function! wraptext#func#wrap(prefix, postfix, mode) range " {{{
     if a:mode ==# "n"
         " normal mode mapping
         call s:DewrapOnline(a:prefix, a:postfix)
@@ -181,7 +181,7 @@ endfunction "Insertstr }}}
 " leader: maybe "<leader>" or other string
 " maparg: argument for mapping, such as "<buffer>", allow moer than one,
 " please write in one string seprated by space
-function! Wrap#BuildWrapMaps(dict, modes, leader, maparg) " {{{
+function! wraptext#func#BuildWrapMaps(dict, modes, leader, maparg) " {{{
     let rls = ""
     " split modes to individaul characters
     let modelist = split(a:modes, '\zs')

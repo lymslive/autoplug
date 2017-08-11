@@ -11,7 +11,8 @@ let s:load = 1
 
 let s:path = expand('<sfile>:p:h')
 
-" LOAD:
+" Command:
+" :PI xxx yyy zzz
 function! autoplug#load(...) abort "{{{
     if a:0 == 0
         return
@@ -21,24 +22,24 @@ function! autoplug#load(...) abort "{{{
         return
     endif
 
-    if type(a:1) != type('')
-        return
-    endif
+    for l:name in a:000
+        if type(l:name) != type('')
+            continue
+        endif
+        if l:name =~# '[/\]$'
+            let l:name = substitute(l:name, '[/\]$', '')
+        endif
 
-    if a:1 =~# '[/\]$'
-        let l:name = substitute(a:1, '[/\]$', '')
-    else
-        let l:name = a:1
-    endif
-
-    try
-        call {l:name}#plugin#load()
-    catch 
-        echoerr 'has no autoplug: ' . a:1
-    endtry
+        try
+            call {l:name}#plugin#load()
+        catch 
+            echomsg 'has no autoplug: ' . l:name
+            continue
+        endtry
+    endfor
 endfunction "}}}
 
-" complete: 
+" Complete: 
 function! autoplug#complete(ArgLead, CmdLine, CursorPos) abort "{{{
     let l:lsGlob = glob(s:path . '/' . a:ArgLead . '*/', 0, 1)
     let l:lsGlob= map(l:lsGlob, 'fnamemodify(v:val, ":p:h:t")')

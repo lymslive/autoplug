@@ -19,3 +19,7 @@ noremap \<Space> :Space<CR>
 
 " in ftplugin/cpp.vim
 " call Spacebar#SpaceModeSelect('Cpp')
+" load: 
+function! spacebar#plugin#load() abort "{{{
+    return 1
+endfunction "}}}

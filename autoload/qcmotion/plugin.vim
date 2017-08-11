@@ -11,6 +11,11 @@ if filereadable(s:thispath . '/' . 'setlocal.vim')
 endif
 
 nnoremap Q q
-nnoremap <silent> q :call qcmotion#NormalMove()<CR>
-vnoremap <silent> q :<C-u>call qcmotion#VisualMove()<CR>
-onoremap <silent> q :call qcmotion#OpendMove()<CR>
+nnoremap <silent> q :call qcmotion#func#NormalMove()<CR>
+vnoremap <silent> q :<C-u>call qcmotion#func#VisualMove()<CR>
+onoremap <silent> q :call qcmotion#func#OpendMove()<CR>
+
+" load: 
+function! qcmotion#plugin#load() abort "{{{
+    return 1
+endfunction "}}}

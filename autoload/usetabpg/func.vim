@@ -15,7 +15,7 @@ augroup TabPage
 augroup end
 
 " jumpto the last visited tabpage "{{{1
-function! tabpage#jumpalt(...)
+function! usetabpg#func#jumpalt(...)
     if a:0 > 0 && a:1 > 0
 	execute 'tabnext ' . a:1
     else
@@ -24,7 +24,7 @@ function! tabpage#jumpalt(...)
 endfunction
 
 " Custom Tabline: -- overall definition
-function! tabpage#CustTabLine() " {{{1
+function! usetabpg#func#CustTabLine() " {{{1
     " s := &tabline string(which contain many marks) 
     " vs := the output visual string(may used to count the column space) 
     let s = ''

@@ -15,14 +15,14 @@ endif
 
 " Option Setting: {{{1
 " custom tabline with much useful indicative information
-set tabline=%!tabpage#CustTabLine()
+set tabline=%!usetabpg#func#CustTabLine()
 " don't use GUI tabline
 " set guioptions-=e
 
 " Command Interface: {{{1
 " :T -- jump to the alternative tabpage which is last visited
 " :[count]T or :T[count] -- jump to the [count]th tabpage
-command! -nargs=* -count=0 T call tabpage#jumpalt(<count>, <f-args>)
+command! -nargs=* -count=0 T call usetabpg#func#jumpalt(<count>, <f-args>)
 
 " Remap Interface: {{{1
 " *gt* is mainly does the same thing as :T, in normal mode.

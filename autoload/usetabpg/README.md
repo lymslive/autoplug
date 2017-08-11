@@ -18,6 +18,7 @@ It may be useful when use multiply tabpages in vim.
 
 * 普通模式下，g-jkhl 在页签间移动，g-[0-9] 直接访问相应编号的页签
 
+<!--
 ## 安装
 
 * 推荐插件管理工作，如 [Vundle](https://github.com/VundleVim/Vundle.vim) 或
@@ -28,7 +29,6 @@ It may be useful when use multiply tabpages in vim.
 * 下载到任意喜欢的目录，然后将该目录加入 runtimpath。如：
 
 >> :set rtp+=/where/you/download/or/put
-
 ## 定制与配置
 
 plugin/usetab.vim 是开放式脚本，它只罗列一些简单的 vim ex 命令，比如设置选项，
@@ -51,3 +51,4 @@ plugin/usetab.vim 是开放式脚本，它只罗列一些简单的 vim ex 命令
 
 若想要暂时禁用本插件，也只要在 usetab.vim 同目录下放一个空实现的 setlocal.vim
 即可。
+-->

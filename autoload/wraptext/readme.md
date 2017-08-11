@@ -13,7 +13,7 @@
 
 核心就一个函数：
 ```
-Wrap#Wrap(prefix, postfix, mode)
+wraptext#func#wrap(prefix, postfix, mode)
 ```
 
 * 前缀文本 prefix 与后缀文本 postfix 可以其一为空串，比如很多语言的注释只要求
@@ -42,11 +42,11 @@ Wrap#Wrap(prefix, postfix, mode)
 ## 【键映射示例】
 
 ```
-nnoremap ,( <ESC>:call Wrap#Wrap("(", ")", "n")<CR>
-vnoremap ,( <ESC>:call Wrap#Wrap("(", ")", "v")<CR>
+nnoremap ,( <ESC>:call wraptext#func#wrap("(", ")", "n")<CR>
+vnoremap ,( <ESC>:call wraptext#func#wrap("(", ")", "v")<CR>
 " 其他各种括号引号
-nnoremap ,<Space> v<ESC>:call Wrap#Wrap(" ", " ", "v")<CR>
-vnoremap ,<Space> <ESC>:call Wrap#Wrap(" ", " ", "v")<CR>
+nnoremap ,<Space> v<ESC>:call wraptext#func#wrap(" ", " ", "v")<CR>
+vnoremap ,<Space> <ESC>:call wraptext#func#wrap(" ", " ", "v")<CR>
 ```
 最后两映射的意思是在选定文本或当前字符前后各添加一个空格。
 
@@ -58,18 +58,18 @@ vnoremap ,<Space> <ESC>:call Wrap#Wrap(" ", " ", "v")<CR>
 对于有编辑功能的命令，我设定的 `<Leader>` 是逗号。添加英文半角括号引号就用一个
 逗号，添加中文全角括号引号，就用两个逗号。
 ```
-nnoremap ,,< <ESC>:call Wrap#Wrap("《", "》", "n")<CR>
-nnoremap ,,[ <ESC>:call Wrap#Wrap("【", "】", "n")<CR>
+nnoremap ,,< <ESC>:call wraptext#func#wrap("《", "》", "n")<CR>
+nnoremap ,,[ <ESC>:call wraptext#func#wrap("【", "】", "n")<CR>
 " 许多中文括号
 ```
 
 在各种文件类型插件中，不同编程语言使用不同的注释符号。如在 `cpp.vim` 中使用如
 下映射：
 ```
-nnoremap <buffer> ,x <ESC>:call Wrap#Wrap('// ', '', "n")<CR>
-vnoremap <buffer> ,x <ESC>:call Wrap#Wrap('// ', '', "v")<CR>
-vnoremap <buffer> ,,x <ESC>:call Wrap#Wrap('/*', '*/', visualmode())<CR>
-vnoremap <buffer> ,X <ESC>:call Wrap#Wrap('#if 0', '#endif', visualmode())<CR>
+nnoremap <buffer> ,x <ESC>:call wraptext#func#wrap('// ', '', "n")<CR>
+vnoremap <buffer> ,x <ESC>:call wraptext#func#wrap('// ', '', "v")<CR>
+vnoremap <buffer> ,,x <ESC>:call wraptext#func#wrap('/*', '*/', visualmode())<CR>
+vnoremap <buffer> ,X <ESC>:call wraptext#func#wrap('#if 0', '#endif', visualmode())<CR>
 ```
 
 Vim 的内置 `x` 命令是删除的意思，注释算是一种特殊删除，因而用 `,x` 作为注释映射。
@@ -93,6 +93,8 @@ inoremap ] []
 [pairs](https://github.com/jiangmiao/auto-pairs)
 提供的功能比较丰富。
 
+<!--
 ## 【安装使用】
 如有需求，按常规的 vim 插件安装方式下载安装。`plugin/Warp.vim` 文件中的键映射
 可自行按需调整。不同语言的文本类型插件中，也自行按上述 `cpp.vim` 示例添加映射。
+-->

@@ -1,6 +1,6 @@
 " Spacebar.vim
 " First Create: 2011-10-27
-" Last Modify: 2016-08
+" Last Modify: 2017-08
 " lymslive (403708621@qq.com)
 
 let s:debug = 1
@@ -105,12 +105,12 @@ endfunction "SpaceCmdFirst }}}
 " End of Space Mode Maps. "}}}
 
 " Space Mode Select: "{{{
-command! -narg=? -bar -complete=custom,s:SpaceComplete Space call Spacebar#SpaceModeSelect(<f-args>)
+command! -narg=? -bar -complete=custom,s:SpaceComplete Space call Spacebar#func#SpaceModeSelect(<f-args>)
 " Argument: A word indicate the space behavior mode, availabe value is list in
 " g:spaceModes. If no argument supplied, cycled to next mode. Addition to
 " that, "Smart" and "NoSmart" is also accept to triggle smart space maps.
 " Custom complete in command is appleneted, and abbreviated is accpeted too.
-function! Spacebar#SpaceModeSelect(...) " {{{
+function! Spacebar#func#SpaceModeSelect(...) " {{{
     if a:0 < 1
         let mode = ""
     else

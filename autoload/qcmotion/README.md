@@ -1,3 +1,5 @@
+# 基于上下文的快速移动方式
+<!--
 # quickly motion in c language file
 
 ## Summary
@@ -8,6 +10,11 @@ may override the macro key, but you can custom this maping directly edit the
 'plugin/qcmotion.vim' or a copy of it and rename to 'setlocal.vim'. 
 (The source comment and doc, if provided, is written in english, and the left
 of this page is written in chinese.)
+-->
+
+## 使用方式
+在 `autoplug` 已加载的情况下执行 `:PI qcmotion` 命令，然后在移动或需要操作块时
+按 `q` 键，或许有奇效。
 
 ## 背景介绍
 
@@ -141,8 +148,8 @@ vim 术语是 Operater-Pending Map，就是像删除（d）、修改（c）以�
 
 ## 实现要点
 
-plugin/ 目录下脚本只是简单的 map 设置，作为用户界面公开接口。实际实现功能的方
-法、函数都写在 autoload/ 目录下，既隐藏实现细节，更利用 vim 的自动加载机制，最
+plugin.vim 脚本只是简单的 map 设置，作为用户界面公开接口。实际实现功能的方
+法、函数都写在 func.vim 文件中，既隐藏实现细节，更利用 vim 的自动加载机制，最
 大化地不影响插件对 vim 启动的速度，延迟到第一次按激活加载脚本。
 
 脚本中，主要用 match 方法按优先级检测可能的移动方式，然后根据不同移动方式调用
@@ -153,33 +160,36 @@ search 移动光标。除了需要用于键映射的入口方法用 qcmation# �
 
 plugin/qcmation.vim 只用简单的用户键设置，有意义的语句就如下几句：
 
-    nnoremap Q q
-    nnoremap <silent> q :call qcmotion#NormalMove()<CR>
-	vnoremap <silent> q :<C-u>call qcmotion#VisualMove()<CR>
-    onoremap <silent> q :call qcmotion#OpendMove()<CR>
+```vim
+: nnoremap Q q
+: nnoremap <silent> q :call qcmotion#func#NormalMove()<CR>
+: vnoremap <silent> q :<C-u>call qcmotion#func#VisualMove()<CR>
+: onoremap <silent> q :call qcmotion#func#OpendMove()<CR>
+```
 
 如果不喜欢用 q 作为该快捷键，可希望保留 q 的记录宏功能，将其中的 q 改为其他想
 要的键即可。
 
-* 不介意直接修改 plugin/qcmation.vim 的键映射语句
+* 不介意直接修改 plugin.vim 的键映射语句
 * 或者在相同目录下复制副本并改名为 setlocal.vim ，再按自己喜好修改
 * 或者将要设置语句拷贝至总配置文件 .vimrc（或其 source 调用的），再在
-  plugin/qcmation.vim 同级处 touch setlocal.vim 建一个空文件。
+  plugin.vim 同级处 touch setlocal.vim 建一个空文件。
 
-当 plugin/qcmation.vim 发现身边有 setclocal.vim 时，只会执行 setlocal.vim。若
+当 plugin.vim 发现身边有 setclocal.vim 时，只会执行 setlocal.vim。若
 好奇这点奇淫技巧，也可直接看源文件。
 
 实在不想用 q 键的用户，可考虑其他不常用的单键。但不甚建议 <leader>q ，如果要按
 两次键，就不够快了，如此， easy-mation 可能更适合了。
 
+<!--
 ### 全局插件局部化
 
 虽然基于 C 语言考虑，但应该也可用于其他类似编程语言，所以将插件放在 plugin/
-目录下，如果只想用于 C 语言而不想妨碍全局，则可将 plugin/qcmation.vim 移至
+目录下，如果只想用于 C 语言而不想妨碍全局，则可将 plugin.vim 移至
 ftplugin/c/qcmation.vim 或 ftplugin/cpp/qcmation.vim，并在 map 设置语句中添加
 <buffer> 参数。
 
 ## 反馈意见
 
 欢迎之至。作者也可能在持续使用中优化体验修改。
-
+-->

@@ -39,7 +39,7 @@ let s:strLine = ''
 let s:char = ''
 
 " Public function for normal map
-function! qcmotion#NormalMove() "{{{1
+function! qcmotion#func#NormalMove() "{{{1
     call s:CheckMotionType('.')
 	" mark the last position
     " call setpos("'`", [0, s:nStartLine, s:nStartCol])
@@ -49,7 +49,7 @@ function! qcmotion#NormalMove() "{{{1
 endfunction
 
 " Public function for visual selection map
-function! qcmotion#VisualMove() " {{{1
+function! qcmotion#func#VisualMove() " {{{1
     call s:CheckMotionType("'>")
 
 	call cursor(s:nStartLine, s:nStartCol)
@@ -62,7 +62,7 @@ function! qcmotion#VisualMove() " {{{1
 endfunction
 
 " Public function for operator-pending map
-function! qcmotion#OpendMove() "{{{1
+function! qcmotion#func#OpendMove() "{{{1
     call s:CheckMotionType('.')
     call s:DoSelectOpend()
     return s:nMotionType
