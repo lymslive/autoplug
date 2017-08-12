@@ -178,7 +178,7 @@ plugin/qcmation.vim 只用简单的用户键设置，有意义的语句就如下
 当 plugin.vim 发现身边有 setclocal.vim 时，只会执行 setlocal.vim。若
 好奇这点奇淫技巧，也可直接看源文件。
 
-实在不想用 q 键的用户，可考虑其他不常用的单键。但不甚建议 <leader>q ，如果要按
+实在不想用 q 键的用户，可考虑其他不常用的单键。但不甚建议 `<leader>q` ，如果要按
 两次键，就不够快了，如此， easy-mation 可能更适合了。
 
 <!--

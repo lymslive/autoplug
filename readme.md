@@ -86,7 +86,7 @@ $ git clone https://github.com/lymslive/autoplug.git
 + [usetabpg](autoload/usetabpg) 使用多标签页工作
 + [microcmd](autoload/microcmd) 简易实用的微命令集
 + [wraptext](autoload/wraptext) 修饰包含括号等小功能
-+ [qcmotion](autoload/qcmotion) 重映射 q 键用于快速移动
++ [qcmotion](autoload/qcmotion) 基于上下文件的单键快速移动
 + [spacebar](autoload/spacebar) 空格键的一些映射
 + [gamemaze](autoload/gamemaze) 在vim下玩玩迷宫游戏(demo)
 
