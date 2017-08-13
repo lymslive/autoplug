@@ -2,12 +2,17 @@
 " Author: lymslive
 " Description: csv editor and viewer
 " Create: 2017-08-10
-" Modify: 2017-08-10
+" Modify: 2017-08-12
 
 "LOAD:
 if exists('s:load') && !exists('g:DEBUG')
     finish
 endif
+
+augroup CSVIEWER
+    autocmd!
+    autocmd BufRead,BufNewFile *.csv,*.CSV call csviewer#command#BufvarName()
+augroup END
 
 " LOAD:
 let s:load = 1

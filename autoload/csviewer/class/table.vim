@@ -2,7 +2,7 @@
 " Author: lymslive
 " Description: VimL class frame
 " Create: 2017-08-12
-" Modify: 2017-08-12
+" Modify: 2017-08-13
 
 "LOAD:
 if exists('s:load') && !exists('g:DEBUG')
@@ -10,18 +10,20 @@ if exists('s:load') && !exists('g:DEBUG')
 endif
 
 " CLASS:
-let s:class = class#old()
+let s:class = class#buffer#based#old()
 let s:class._name_ = 'csviewer#class#table'
 let s:class._version_ = 1
 
-let s:class.bufnr = 0
-let s:class.owner = class#new()
 let s:class.grid_head = class#new()
 let s:class.grid_cell = class#new()
+
+let s:class.move_by_cell = v:true
 
 " the default cell size 1*8
 let s:DEFAULT_WIDTH = 8
 let s:DEFAULT_HEIGHT = 1
+
+let s:BUFVAR = csviewer#command#BufvarName()
 
 function! csviewer#class#table#class() abort "{{{
     return s:class
@@ -41,11 +43,13 @@ function! csviewer#class#table#ctor(this, ...) abort "{{{
     let l:bufnr = bufnr('%')
     : update
 
-    let a:this.owner = a:1
     let l:csvname = a:this.owner.source.Name()
     : execute 'edit ' . l:csvname . '.tab' 
     let a:this.bufnr = bufnr('%')
     call a:this.Init()
+    call a:this.SetOwner(a:1)
+    call a:this.RegBufvar(s:BUFVAR)
+    call csviewer#command#BufTable()
 
     if l:bufnr > 0
         : execute 'buffer ' . l:bufnr
@@ -59,9 +63,10 @@ endfunction "}}}
 
 " Init: 
 function! s:class.Init() dict abort "{{{
-    let l:iHead = self.owner.source.headNum
-    let l:iCell = len(self.owner.source.cell)
-    let l:iWidth = len(self.owner.source.cell[0])
+    let l:matCell = self.owner.GetCell()
+    let l:iHead = self.owner.headNum
+    let l:iCell = len(l:matCell)
+    let l:iWidth = len(l:matCell[0])
 
     if l:iHead > 0
         let self.grid_head = class#fantasy#grid#new(l:iWidth, l:iHead)
@@ -75,10 +80,10 @@ function! s:class.Init() dict abort "{{{
 
     let l:iLine = 1
     if l:iHead > 0
-        let l:lsGrid = self.grid_head.Fillout(self.owner.source.header, l:iLine)
+        let l:lsGrid = self.grid_head.Fillout(self.owner.header, l:iLine)
         let l:iLine += len(l:lsGrid)
     endif
-    let l:lsGrid = self.grid_cell.Fillout(self.owner.source.cell, l:iLine)
+    let l:lsGrid = self.grid_cell.Fillout(l:matCell, l:iLine)
 
     return self
 endfunction "}}}
@@ -86,6 +91,16 @@ endfunction "}}}
 " Redraw: 
 function! s:class.Redraw() dict abort "{{{
     " code
+endfunction "}}}
+
+" SwitchView: 
+function! s:class.SwitchView() dict abort "{{{
+    call self.owner.source.Focus()
+endfunction "}}}
+
+" SwitchMove: 
+function! s:class.SwitchMove() dict abort "{{{
+    let self.move_by_cell = !self.move_by_cell
 endfunction "}}}
 
 " LOAD:

@@ -2,7 +2,7 @@
 " Author: lymslive
 " Description: VimL class frame
 " Create: 2017-08-12
-" Modify: 2017-08-12
+" Modify: 2017-08-13
 
 "LOAD:
 if exists('s:load') && !exists('g:DEBUG')
@@ -10,7 +10,7 @@ if exists('s:load') && !exists('g:DEBUG')
 endif
 
 " CLASS:
-let s:class = class#old()
+let s:class = class#textfile#csv#old()
 let s:class._name_ = 'csviewer#class#csv'
 let s:class._version_ = 1
 
@@ -39,11 +39,18 @@ function! csviewer#class#csv#ctor(this, ...) abort "{{{
         let a:this.source = a:1
         let a:this.source.owner = a:this
     endif
+    let l:Suctor = class#Suctor(s:class)
+    call l:Suctor(a:this, a:this.source.filepath)
 endfunction "}}}
 
 " ISOBJECT:
 function! csviewer#class#csv#isobject(that) abort "{{{
     return class#isobject(s:class, a:that)
+endfunction "}}}
+
+" list: 
+function! s:class.list() dict abort "{{{
+    return getbufline(self.source.bufnr, 1, '$')
 endfunction "}}}
 
 " LOAD:
