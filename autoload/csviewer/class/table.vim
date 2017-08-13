@@ -90,7 +90,8 @@ endfunction "}}}
 
 " Redraw: 
 function! s:class.Redraw() dict abort "{{{
-    " code
+    call self.owner.ParseFile(v:true)
+    call self.Init()
 endfunction "}}}
 
 " SwitchView: 
@@ -101,6 +102,111 @@ endfunction "}}}
 " SwitchMove: 
 function! s:class.SwitchMove() dict abort "{{{
     let self.move_by_cell = !self.move_by_cell
+endfunction "}}}
+
+" OnLeft: 
+function! s:class.OnLeft() dict abort "{{{
+    if self.move_by_cell
+        if s:FCursor.GetChar() ==# '|'
+            : normal! b
+        else
+            : normal! F|b
+        endif
+    else
+        : normal! h
+    endif
+endfunction "}}}
+
+" OnRight: 
+function! s:class.OnRight() dict abort "{{{
+    if self.move_by_cell
+        if s:FCursor.GetChar() ==# '|'
+            : normal! w
+        else
+            : normal! f|w
+        endif
+    else
+        : normal! l
+    endif
+endfunction "}}}
+
+" OnDown: 
+function! s:class.OnDown() dict abort "{{{
+    if line('.') >= line('$')
+        return
+    endif
+
+    if s:FCursor.GetChar() ~=# '[-+]'
+        : normal! j
+        return
+    endif
+
+    : normal! j
+
+    " suppose cell height is 1
+    if self.move_by_cell
+        : normal! j
+    endif
+endfunction "}}}
+
+" OnUp: 
+function! s:class.OnUp() dict abort "{{{
+    if line('.') <= 1
+        return
+    endif
+
+    if s:FCursor.GetChar() ~=# '[-+]'
+        : normal! k
+        return
+    endif
+
+    : normal! j
+
+    " suppose cell height is 1
+    if self.move_by_cell
+        : normal! k
+    endif
+
+endfunction "}}}
+
+" GetCellPos: 
+function! s:class.GetCellPos() dict abort "{{{
+    let l:iRow = line('.')
+    let l:iRow = l:iRow / 2
+
+    let l:lsPart = s:FCursor.SplitLine()
+    let l:sPrevCursor = l:lsPart[0]
+    if empty(l:sPrevCursor)
+        let l:iCol = 1
+    else
+        let l:lsCell = split(l:sPrevCursor, '|')
+        let l:iCol = len(l:lsCell)
+    endif
+    return [l:iRow, l:iCol]
+endfunction "}}}
+
+" GotoCell: 
+" a:1, 'b' or 'e' goto begin or end of cell, defaut 'b'
+function! s:class.GotoCell(row, col, ...) dict abort "{{{
+    let l:row = 2 * a:row
+    if l:row < 1 || l:row > line('$')
+        return
+    endif
+
+    " goto begin of row
+    : execute 'normal! ' . l:row . 'G^'
+
+    let l:bCellEnd = get(a:000, 0, 'b') =~? '^e'
+    if a:col == 1
+        if l:bCellEnd
+            : normal! t|
+        endif
+    else
+        : execute 'normal! ' . a:col - 1 . 'f|w'
+        if l:bCellEnd
+            : normal! t|
+        endif
+    endif
 endfunction "}}}
 
 " LOAD:

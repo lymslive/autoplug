@@ -163,7 +163,7 @@ function! s:class.GotoCell(row, col, ...) dict abort "{{{
             : normal! t,
         endif
     else
-        : execute 'normal! ' . l:iCol - 1 . 'f,w'
+        : execute 'normal! ' . a:col - 1 . 'f,w'
         if l:bCellEnd
             : normal! t,
         endif

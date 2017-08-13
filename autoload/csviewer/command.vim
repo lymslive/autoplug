@@ -38,6 +38,8 @@ function! csviewer#command#BufTable() abort "{{{
     : setlocal nonumber
     : setlocal nowrap
 
+    noremap r :call <SID>Redraw()<CR>
+
     let b:ftplugin_csviewer_done = 1
 endfunction "}}}
 
@@ -70,6 +72,7 @@ function! s:CreateObject(...) abort "{{{
 
     if a:0 > 0 && a:1
         let l:jTable = csviewer#class#table#new(l:jCsv)
+        let l:jOwner.table = l:jTable
     endif
 endfunction "}}}
 
@@ -177,4 +180,9 @@ function! s:ParsePos(pos) abort "{{{
     let l:col += 1
 
     return [l:row, l:col]
+endfunction "}}}
+
+" Redraw: 
+function! s:Redraw() abort "{{{
+    call b:[s:BUFVAR].Redraw()
 endfunction "}}}

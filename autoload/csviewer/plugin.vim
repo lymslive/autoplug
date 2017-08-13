@@ -2,7 +2,7 @@
 " Author: lymslive
 " Description: csv editor and viewer
 " Create: 2017-08-10
-" Modify: 2017-08-12
+" Modify: 2017-08-13
 
 "LOAD:
 if exists('s:load') && !exists('g:DEBUG')
@@ -11,7 +11,7 @@ endif
 
 augroup CSVIEWER
     autocmd!
-    autocmd BufRead,BufNewFile *.csv,*.CSV call csviewer#command#BufvarName()
+    autocmd BufRead,BufNewFile *.csv,*.CSV call csviewer#command#BufSource()
 augroup END
 
 " LOAD:
