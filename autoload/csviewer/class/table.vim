@@ -2,12 +2,14 @@
 " Author: lymslive
 " Description: VimL class frame
 " Create: 2017-08-12
-" Modify: 2017-08-13
+" Modify: 2017-08-14
 
 "LOAD:
 if exists('s:load') && !exists('g:DEBUG')
     finish
 endif
+
+let s:FCursor = class#less#cursor#export()
 
 " CLASS:
 let s:class = class#buffer#based#old()
@@ -39,15 +41,15 @@ function! csviewer#class#table#new(...) abort "{{{
     return l:obj
 endfunction "}}}
 " CTOR:
-function! csviewer#class#table#ctor(this, ...) abort "{{{
+function! csviewer#class#table#ctor(this, owner, ...) abort "{{{
     let l:bufnr = bufnr('%')
     : update
 
+    call a:this.SetOwner(a:owner)
     let l:csvname = a:this.owner.source.Name()
     : execute 'edit ' . l:csvname . '.tab' 
     let a:this.bufnr = bufnr('%')
     call a:this.Init()
-    call a:this.SetOwner(a:1)
     call a:this.RegBufvar(s:BUFVAR)
     call csviewer#command#BufTable()
 
@@ -64,19 +66,24 @@ endfunction "}}}
 " Init: 
 function! s:class.Init() dict abort "{{{
     let l:matCell = self.owner.GetCell()
+    if empty(l:matCell)
+        : ELOG 'empty cell when init table csv'
+        return self
+    endif
+
     let l:iHead = self.owner.headNum
     let l:iCell = len(l:matCell)
     let l:iWidth = len(l:matCell[0])
 
     if l:iHead > 0
         let self.grid_head = class#fantasy#grid#new(l:iWidth, l:iHead)
-        let self.grid_head.SetWidth(s:DEFAULT_WIDTH)
-        let self.grid_head.SetHeight(s:DEFAULT_HEIGHT)
+        call self.grid_head.SetWidth(s:DEFAULT_WIDTH)
+        call self.grid_head.SetHeight(s:DEFAULT_HEIGHT)
     endif
 
     let self.grid_cell = class#fantasy#grid#new(l:iWidth, l:iCell)
-    let self.grid_cell.SetWidth(s:DEFAULT_WIDTH)
-    let self.grid_cell.SetHeight(s:DEFAULT_HEIGHT)
+    call self.grid_cell.SetWidth(s:DEFAULT_WIDTH)
+    call self.grid_cell.SetHeight(s:DEFAULT_HEIGHT)
 
     let l:iLine = 1
     if l:iHead > 0
@@ -90,13 +97,24 @@ endfunction "}}}
 
 " Redraw: 
 function! s:class.Redraw() dict abort "{{{
+    : setlocal modifiable
     call self.owner.ParseFile(v:true)
     call self.Init()
+    : setlocal nomodifiable
+endfunction "}}}
+
+" EnterView: 
+function! s:class.EnterView(...) dict abort "{{{
+    call self.Focus()
+    let [l:row, l:col] = self.owner.GetPosition()
+    call self.GotoCell(l:row, l:col, get(a:000, 0, ''))
+    return self
 endfunction "}}}
 
 " SwitchView: 
 function! s:class.SwitchView() dict abort "{{{
-    call self.owner.source.Focus()
+    call self.owner.SavePosition(self.GetCellPos())
+    call self.owner.source.EnterView()
 endfunction "}}}
 
 " SwitchMove: 
@@ -107,11 +125,9 @@ endfunction "}}}
 " OnLeft: 
 function! s:class.OnLeft() dict abort "{{{
     if self.move_by_cell
-        if s:FCursor.GetChar() ==# '|'
-            : normal! b
-        else
-            : normal! F|b
-        endif
+        let [l:row, l:col] = self.GetCellPos()
+        let l:col -= 1
+        call self.GotoCell(l:row, l:col)
     else
         : normal! h
     endif
@@ -120,11 +136,9 @@ endfunction "}}}
 " OnRight: 
 function! s:class.OnRight() dict abort "{{{
     if self.move_by_cell
-        if s:FCursor.GetChar() ==# '|'
-            : normal! w
-        else
-            : normal! f|w
-        endif
+        let [l:row, l:col] = self.GetCellPos()
+        let l:col += 1
+        call self.GotoCell(l:row, l:col)
     else
         : normal! l
     endif
@@ -132,54 +146,40 @@ endfunction "}}}
 
 " OnDown: 
 function! s:class.OnDown() dict abort "{{{
-    if line('.') >= line('$')
-        return
-    endif
-
-    if s:FCursor.GetChar() ~=# '[-+]'
-        : normal! j
-        return
-    endif
-
-    : normal! j
-
-    " suppose cell height is 1
     if self.move_by_cell
+        let [l:row, l:col] = self.GetCellPos()
+        let l:row += 1
+        call self.GotoCell(l:row, l:col)
+    else
         : normal! j
     endif
 endfunction "}}}
 
 " OnUp: 
 function! s:class.OnUp() dict abort "{{{
-    if line('.') <= 1
-        return
-    endif
-
-    if s:FCursor.GetChar() ~=# '[-+]'
-        : normal! k
-        return
-    endif
-
-    : normal! j
-
-    " suppose cell height is 1
     if self.move_by_cell
+        let [l:row, l:col] = self.GetCellPos()
+        let l:row -= 1
+        call self.GotoCell(l:row, l:col)
+    else
         : normal! k
     endif
-
 endfunction "}}}
 
 " GetCellPos: 
 function! s:class.GetCellPos() dict abort "{{{
     let l:iRow = line('.')
     let l:iRow = l:iRow / 2
+    if iRow < 1
+        let l:iRow = 1
+    endif
 
     let l:lsPart = s:FCursor.SplitLine()
     let l:sPrevCursor = l:lsPart[0]
     if empty(l:sPrevCursor)
         let l:iCol = 1
     else
-        let l:lsCell = split(l:sPrevCursor, '|')
+        let l:lsCell = split(l:sPrevCursor, '[|+]')
         let l:iCol = len(l:lsCell)
     endif
     return [l:iRow, l:iCol]
@@ -188,7 +188,19 @@ endfunction "}}}
 " GotoCell: 
 " a:1, 'b' or 'e' goto begin or end of cell, defaut 'b'
 function! s:class.GotoCell(row, col, ...) dict abort "{{{
-    let l:row = 2 * a:row
+    let [l:hsize, l:wsize] = self.owner.GetSize()
+    if a:row > l:hsize || a:row <= 0
+        return
+    else
+        let l:row = a:row
+    endif
+    if a:col > l:wsize || a:col <= 0
+        return
+    else
+        let l:col = a:col
+    endif
+
+    let l:row = 2 * l:row
     if l:row < 1 || l:row > line('$')
         return
     endif
@@ -197,16 +209,29 @@ function! s:class.GotoCell(row, col, ...) dict abort "{{{
     : execute 'normal! ' . l:row . 'G^'
 
     let l:bCellEnd = get(a:000, 0, 'b') =~? '^e'
-    if a:col == 1
+    if l:col <= 1
         if l:bCellEnd
             : normal! t|
+        else
+            : normal! w
         endif
     else
-        : execute 'normal! ' . a:col - 1 . 'f|w'
+        : execute 'normal! ' . (l:col-1) . 'f|w'
         if l:bCellEnd
             : normal! t|
         endif
     endif
+endfunction "}}}
+
+" OnEdit: 
+function! s:class.OnEdit(cmd) dict abort "{{{
+    if a:cmd =~? '^a'
+        let l:end = 'e'
+    else
+        let l:end = 'b'
+    endif
+    call self.owner.SavePosition(self.GetCellPos())
+    call self.owner.source.EnterView(l:end)
 endfunction "}}}
 
 " LOAD:

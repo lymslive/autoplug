@@ -2,7 +2,7 @@
 " Author: lymslive
 " Description: VimL class frame
 " Create: 2017-08-12
-" Modify: 2017-08-13
+" Modify: 2017-08-14
 
 "LOAD:
 if exists('s:load') && !exists('g:DEBUG')
@@ -28,7 +28,7 @@ endfunction "}}}
 
 " NEW: create from current buffer
 function! csviewer#class#source#new(...) abort "{{{
-    let l:ext = exand('%:p:t:e')
+    let l:ext = expand('%:p:t:e')
     if l:ext !=? 'csv'
         : ELOG '[csviewer#class#source#new] current buffer is not csv'
         return {}
@@ -50,20 +50,29 @@ endfunction "}}}
 
 " Name: 
 function! s:class.Name() dict abort "{{{
-    return fnamemodify(self.path, ':p:t:r')
+    return fnamemodify(self.filepath, ':p:t:r')
 endfunction "}}}
 
 " GetViewTable: 
 function! s:class.GetViewTable() dict abort "{{{
     if empty(self.owner.table)
-        let self.owner.talbe = csviewer#class#table#ctor(self.owner)
+        let self.owner.table = csviewer#class#table#new(self.owner)
     endif
     return self.owner.table
 endfunction "}}}
 
+" EnterView: 
+function! s:class.EnterView(...) dict abort "{{{
+    call self.Focus()
+    let [l:row, l:col] = self.owner.GetPosition()
+    call self.GotoCell(l:row, l:col, get(a:000, 0, ''))
+    return self
+endfunction "}}}
+
 " SwitchView: 
 function! s:class.SwitchView() dict abort "{{{
-    call self.GetViewTable().Focus()
+    call self.owner.SavePosition(self.GetCellPos())
+    call self.GetViewTable().EnterView()
 endfunction "}}}
 
 " SwitchMove: 
@@ -103,15 +112,15 @@ function! s:class.OnDown() dict abort "{{{
         return
     endif
 
-    : normal! j
-
     if self.move_by_cell
         let l:posCell = self.GetCellPos()
         let l:iCol = l:posCell[1]
-        : normal! ^
+        : normal! j^
         if l:iCol > 1
-            : execute 'normal! ' . l:iCol - 1 . 'f,w'
+            : execute 'normal! ' . (l:iCol-1) . 'f,w'
         endif
+    else
+        : normal! j
     endif
 endfunction "}}}
 
@@ -121,15 +130,15 @@ function! s:class.OnUp() dict abort "{{{
         return
     endif
 
-    : normal! k
-
     if self.move_by_cell
         let l:posCell = self.GetCellPos()
         let l:iCol = l:posCell[1]
-        : normal! ^
+        : normal! k^
         if l:iCol > 1
-            : execute 'normal! ' . l:iCol - 1 . 'f,w'
+            : execute 'normal! ' . (l:iCol-1) . 'f,w'
         endif
+    else
+        : normal! k
     endif
 endfunction "}}}
 
@@ -141,7 +150,7 @@ function! s:class.GetCellPos() dict abort "{{{
     if empty(l:sPrevCursor)
         let l:iCol = 1
     else
-        let l:lsCell = split(l:sPrevCursor, ',')
+        let l:lsCell = split(l:sPrevCursor, ',', 1)
         let l:iCol = len(l:lsCell)
     endif
     return [l:iRow, l:iCol]
@@ -163,7 +172,7 @@ function! s:class.GotoCell(row, col, ...) dict abort "{{{
             : normal! t,
         endif
     else
-        : execute 'normal! ' . a:col - 1 . 'f,w'
+        : execute 'normal! ' . (a:col-1) . 'f,w'
         if l:bCellEnd
             : normal! t,
         endif

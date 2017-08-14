@@ -2,7 +2,7 @@
 " Author: lymslive
 " Description: VimL class frame
 " Create: 2017-08-12
-" Modify: 2017-08-13
+" Modify: 2017-08-14
 
 "LOAD:
 if exists('s:load') && !exists('g:DEBUG')
@@ -18,6 +18,9 @@ let s:class._version_ = 1
 let s:class.source = class#new()
 " the tablized view buffer
 let s:class.table = class#new()
+
+" current cell [row, col], 1-based index
+let s:class.position = []
 
 function! csviewer#class#csv#class() abort "{{{
     return s:class
@@ -35,12 +38,15 @@ function! csviewer#class#csv#new(...) abort "{{{
 endfunction "}}}
 " CTOR:
 function! csviewer#class#csv#ctor(this, ...) abort "{{{
-    if csviewer#class#buffer#isobject(a:1)
+    if csviewer#class#source#isobject(a:1)
         let a:this.source = a:1
         let a:this.source.owner = a:this
+    else
+        : ELOG 'not csviewer#class#source object'
     endif
     let l:Suctor = class#Suctor(s:class)
     call l:Suctor(a:this, a:this.source.filepath)
+    let a:this.position = [1, 1]
 endfunction "}}}
 
 " ISOBJECT:
@@ -50,7 +56,30 @@ endfunction "}}}
 
 " list: 
 function! s:class.list() dict abort "{{{
-    return getbufline(self.source.bufnr, 1, '$')
+    return self.source.list()
+endfunction "}}}
+
+" SavePosition: 
+function! s:class.SavePosition(...) dict abort "{{{
+    if a:0 >= 2
+        let l:row = a:1
+        let l:col = a:2
+    elseif a:0 == 1
+        let l:row = a:1[0]
+        let l:col = a:1[1]
+    else
+        : ELOG '[csv.SavePosition()]: expect (row, col) or [row, col]'
+        return self
+    endif
+
+    " todo: check valid position
+    let self.position = [l:row, l:col]
+    return self
+endfunction "}}}
+
+" GetPosition: 
+function! s:class.GetPosition() dict abort "{{{
+    return self.position
 endfunction "}}}
 
 " LOAD:

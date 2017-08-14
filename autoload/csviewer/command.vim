@@ -2,7 +2,7 @@
 " Author: lymslive
 " Description: 
 " Create: 2017-08-12
-" Modify: 2017-08-13
+" Modify: 2017-08-14
 
 let s:BUFVAR = 'csviewer'
 " BufvarName: 
@@ -33,12 +33,15 @@ function! csviewer#command#BufTable() abort "{{{
 
     call s:CommonUI()
 
-    : setlocal buftype=nofile
+    : setlocal buftype=nowrite
+    : setlocal bufhidden=hide
     : setlocal nomodifiable
     : setlocal nonumber
     : setlocal nowrap
 
-    noremap r :call <SID>Redraw()<CR>
+    nnoremap <buffer> r :call <SID>Redraw()<CR>
+    nnoremap <buffer> i :call <SID>EditCell('i')<CR>i
+    nnoremap <buffer> a :call <SID>EditCell('a')<CR>a
 
     let b:ftplugin_csviewer_done = 1
 endfunction "}}}
@@ -49,12 +52,12 @@ function! s:CommonUI() abort "{{{
     command! -buffer -nargs=0 C call s:SwitchMove()
     command! -buffer -nargs=* Cell call s:GotoCell(<f-args>)
 
-    noremap h :call <SID>Left()<CR>
-    noremap l :call <SID>Right()<CR>
-    noremap j :call <SID>Down()<CR>
-    noremap k :call <SID>UP()<CR>
+    nnoremap <buffer> h :call <SID>Left()<CR>
+    nnoremap <buffer> l :call <SID>Right()<CR>
+    nnoremap <buffer> j :call <SID>Down()<CR>
+    nnoremap <buffer> k :call <SID>Up()<CR>
 
-    noremap <F2> :call <SID>SwithMove()<CR>
+    nnoremap <F2> :call <SID>SwitchMove()<CR>
 
 endfunction "}}}
 
@@ -63,7 +66,7 @@ endfunction "}}}
 " 2 buffer variable
 " a:1, determine if also create table view object immediately
 function! s:CreateObject(...) abort "{{{
-    let l:jSource = csviewer#class#buffer#new()
+    let l:jSource = csviewer#class#source#new()
     if empty(l:jSource)
         return
     endif
@@ -100,7 +103,7 @@ function! s:Left() abort "{{{
     if has_key(b:, s:BUFVAR) && !empty(b:[s:BUFVAR])
         call b:[s:BUFVAR].OnLeft()
     else
-        normal h
+        normal! h
     endif
 endfunction "}}}
 
@@ -109,16 +112,16 @@ function! s:Right() abort "{{{
     if has_key(b:, s:BUFVAR) && !empty(b:[s:BUFVAR])
         call b:[s:BUFVAR].OnRight()
     else
-        normal l
+        normal! l
     endif
 endfunction "}}}
 
 " Down: 
-function! s:class.Down() dict abort "{{{
+function! s:Down() abort "{{{
     if has_key(b:, s:BUFVAR) && !empty(b:[s:BUFVAR])
         call b:[s:BUFVAR].OnDown()
     else
-        normal j
+        normal! j
     endif
 endfunction "}}}
 
@@ -127,7 +130,7 @@ function! s:Up() abort "{{{
     if has_key(b:, s:BUFVAR) && !empty(b:[s:BUFVAR])
         call b:[s:BUFVAR].OnUp()
     else
-        normal k
+        normal! k
     endif
 endfunction "}}}
 
@@ -174,9 +177,10 @@ function! s:ParsePos(pos) abort "{{{
         return []
     endif
 
-    let l:row = l:lsMatch[1]
+    let l:col = l:lsMatch[1]
+    let l:row = l:lsMatch[2]
     let l:Fcvs = class#textfile#csv#class()
-    let l:col = l:Fcvs.Letter2Column(l:lsMatch[0])
+    let l:col = l:Fcvs.Letter2Column(l:col)
     let l:col += 1
 
     return [l:row, l:col]
@@ -185,4 +189,9 @@ endfunction "}}}
 " Redraw: 
 function! s:Redraw() abort "{{{
     call b:[s:BUFVAR].Redraw()
+endfunction "}}}
+
+" EditCell: 
+function! s:EditCell(cmd) abort "{{{
+    call b:[s:BUFVAR].OnEdit(a:cmd)
 endfunction "}}}
