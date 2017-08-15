@@ -9,3 +9,4 @@ Session.vim
 Sessionx.vim
 *.tgz
 *.tar.gz
+*.vimrc

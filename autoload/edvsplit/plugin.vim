@@ -55,14 +55,19 @@ command! -nargs=+ -complete=file_in_path ED call edvsplit#ED#EditInDouble(<f-arg
 command! -nargs=* A call edvsplit#AB#EditAltFile(expand("%:p"), <f-args>)
 command! -nargs=* AE call edvsplit#AB#EditAltFile(<f-args>)
 
+" load: 
+function! edvsplit#plugin#load() abort "{{{
+    return 1
+endfunction "}}}
+
 " File Type Plugin: {{{1
 
 " onft: 
 function! edvsplit#plugin#onft(fn, ft) abort "{{{
-    nnoremap <silent> <buffer> <CR> @=HCPP#SwitchFunctionDef() == 1 ? '^f(' : ':' . expand("<cword>")<CR>
+    nnoremap <silent> <buffer> <CR> @=edvsplit#HCPP#SwitchFunctionDef() == 1 ? '^f(' : ':' . expand("<cword>")<CR>
 endfunction "}}}
 
 augroup EDVSPLIT
     autocmd!
-    autocmd filetype *.cpp,*.c,*.h call edvsplit#plugin#onft(<afile>, <amatch>)
+    autocmd filetype cpp,c call edvsplit#plugin#onft('<afile>', '<amatch>')
 augroup END

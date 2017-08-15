@@ -142,7 +142,7 @@ function! s:JumpToAnotherFile(target_ft) " {{{1
 			call AB#EditAltFile(expand("%:p"))
 		endif
 	else
-		call ED#EditAltInAnother()
+        call edvsplit#ED#EditAltInAnother()
 	endif
 endfunction
 

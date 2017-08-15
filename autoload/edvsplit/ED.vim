@@ -171,7 +171,7 @@ function! edvsplit#ED#EditAltOfAnother(...) " {{{1
 	endif
 	let idx = edvsplit#ED#FindAnother()
 	let file = bufname(winbufnr(idx))
-	let altfile = AB#FindAltFile(file, extspec)
+    let altfile = edvsplit#AB#FindAltFile(file, extspec)
 	" echomsg altfile
 	if strlen(altfile) > 0
 		execute "edit ". altfile
@@ -195,7 +195,7 @@ function! edvsplit#ED#EditAltInAnother(...) " {{{1
 	endif
 	let idx = edvsplit#ED#FindAnother()
 	execute idx . 'wincmd w'
-	let altfile = AB#FindAltFile(file, extspec)
+    let altfile = edvsplit#AB#FindAltFile(file, extspec)
 	" echomsg altfile
 	if strlen(altfile) > 0
 		execute "edit ". altfile
@@ -208,7 +208,7 @@ endfunction
 " edit two files in tow windows, if only one argument, find it's alt-file
 function! edvsplit#ED#EditInDouble(file, ...) " {{{1
 	if a:0 <= 0
-		let altfile = AB#FindAltFile(a:file)
+        let altfile = edvsplit#AB#FindAltFile(a:file)
 	else
 		let altfile = a:1
 	endif

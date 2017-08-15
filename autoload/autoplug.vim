@@ -2,7 +2,7 @@
 " Author: lymslive
 " Description: VimL class frame
 " Create: 2017-08-10
-" Modify: 2017-08-11
+" Modify: 2017-08-15
 
 if exists('s:load') && !exists('g:DEBUG')
     finish
@@ -52,4 +52,4 @@ function! autoplug#complete(ArgLead, CmdLine, CursorPos) abort "{{{
     return l:lsGlob
 endfunction "}}}
 
-command! -nargs=? -complete=customlist,autoplug#complete PI call autoplug#load(<f-args>)
+command! -nargs=* -complete=customlist,autoplug#complete PI call autoplug#load(<f-args>)

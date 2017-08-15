@@ -62,3 +62,8 @@ inoremap { {}<Left>
 inoremap } {}
 " inoremap ) ()
 inoremap ] []
+
+" load:  "{{{1
+function! wraptext#plugin#load() abort "{{{
+    return 1
+endfunction "}}}

@@ -27,7 +27,7 @@ command! -nargs=* -count=0 T call usetabpg#func#jumpalt(<count>, <f-args>)
 " Remap Interface: {{{1
 " *gt* is mainly does the same thing as :T, in normal mode.
 " :help gt to see the default gt behavior
-nnoremap gt :call tabpage#jumpalt()<CR>
+nnoremap gt :call usetabpg#func#jumpalt()<CR>
 nnoremap gT :tabnew<CR>
 
 " *gn* directly jump to the n-th tabpage
@@ -48,3 +48,8 @@ nnoremap gh :tabfirst<CR>
 nnoremap gj :tabnext<CR>
 nnoremap gk :tabprevious<CR>
 nnoremap gl :tablast<CR>
+
+" load: {{{1
+function! usetabpg#plugin#load() abort "{{{
+    return 1
+endfunction "}}}
