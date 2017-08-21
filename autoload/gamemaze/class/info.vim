@@ -2,7 +2,7 @@
 " Author: lymslive
 " Description: VimL class frame
 " Create: 2017-07-15
-" Modify: 2017-08-11
+" Modify: 2017-08-21
 
 "LOAD:
 if exists('s:load') && !exists('g:DEBUG')
@@ -286,6 +286,9 @@ function! s:class.OnStart() dict abort "{{{
     let l:item.text = l:sReplace
 
     if has('timers')
+        if has_key(self, 'timer_')
+            call timer_stop(self.timer_)
+        endif
         let self.timer_ = timer_start(5000, self.OnUpdataTime, {'repeat': -1})
     endif
 
