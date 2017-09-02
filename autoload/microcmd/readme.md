@@ -138,6 +138,10 @@ P 命令也可再带一个参数，用于指定寄存器名，这一般在执行
 
 ## 安装使用
 
+我不再为这类小功能插件维护独立仓库了。先安装 `autoplug`，然后 `:PI microcmd`
+可开启这里的功能命令。
+
+<!--
 按常用插件管理机制下载安装即可。
 [vundle](https://github.com/VundleVim/Vundle.vim) 或
 [pathogen](https://github.com/tpope/vim-pathogen) 都是好东西。
@@ -151,3 +155,4 @@ set rtp+=~/any/download/path
 
 本插件的 `plugin/*.vim` 允许被修改定制，或另存为 `setlocal.vim` 再作修改定制。
 比如使用其他字母作为命令名，或增加键映射到某些命令。
+-->
