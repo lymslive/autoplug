@@ -2,7 +2,7 @@
 " Author: lymslive
 " Description: a tabpage in vim to play maze game
 " Create: 2017-07-13
-" Modify: 2017-08-11
+" Modify: 2017-08-21
 
 "LOAD:
 if exists('s:load') && !exists('g:DEBUG')
@@ -106,16 +106,13 @@ function! s:class.SolveMaze() dict abort "{{{
     let l:maze = self.winplay.maze
     let l:graph = l:maze.ConvertGraph()
 
-    let l:lsRoomID = []
+    let l:lsRoomID = ['0,0']
     for l:cell in self.winplay.cell
         let l:id = l:cell[0] . ',' . l:cell[1]
-        call add(l:lsRoomID, l:id)
+        if l:id !=# '0,0'
+            call add(l:lsRoomID, l:id)
+        endif
     endfor
-
-    " insert origin room to the head
-    if l:lsRoomID[0] !=# '0,0'
-        call insert(l:lsRoomID, '0,0')
-    endif
 
     if self.game.Target == self.constant.DIRECTION
         let l:jDist = class#graph#distance#new(l:graph)
