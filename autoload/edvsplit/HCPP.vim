@@ -139,7 +139,7 @@ function! s:JumpToAnotherFile(target_ft) " {{{1
 		let l:anothername = expand('%:t:r')
 		if l:anothername !=# s:FileName
 			wincmd p
-			call AB#EditAltFile(expand("%:p"))
+			call edvsplit#AB#EditAltFile(expand("%:p"))
 		endif
 	else
         call edvsplit#ED#EditAltInAnother()
