@@ -37,7 +37,7 @@ function! edvsplit#AB#FindAltInPath(file, path, ...) " {{{1
 	else
 		let gfiles = glob(a:path . '/' . basename, 1, 1)
 		if len(gfiles) > 0
-			let filefound = gifles[0]
+            let filefound = gfiles[0]
 		endif
 	endif
 
