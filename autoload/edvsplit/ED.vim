@@ -139,9 +139,15 @@ function! edvsplit#ED#MoveToAnother(mode) " {{{1
 	wincmd p
 endfunction
 
-" Find a file and jump to specific lineno
+" Findfl: Find a file and jump to specific lineno
 " the input arg string is in patter 'file:line' as from error log
 function! edvsplit#ED#Findfl(arg) " {{{1
+    " 1. try find in project
+    if edvsplit#ED#FindInProject(a:arg) == 1
+        return 1
+    endif
+
+    " 2. try find in option &path
 	let target = split(a:arg, ":")
 	let narg = len(target)
 	if narg < 1 || narg > 2
@@ -156,6 +162,41 @@ function! edvsplit#ED#Findfl(arg) " {{{1
 		execute 'find ' . file
 	endif
 endfunction
+
+" FindInProject: find and edit 'file:line' in this project
+" return 1 as success if the file found, otherwise 0 default
+function! edvsplit#ED#FindInProject(arg) abort "{{{
+    let target = split(a:arg, ":")
+    let narg = len(target)
+    if narg < 1 || narg > 2
+        echoerr "expect argument: file:lineno"
+        return
+    endif
+
+    " 1. find below current directory
+    let file = target[0]
+    let l:foudPath = findfile(file, './**,**')
+    if empty(l:foudPath)
+        " 2. find below project directory
+        let l:exrpt = class#less#rtp#export()
+        let l:prjdir = l:exrpt.FindPrject('.')
+        if !empty(l:prjdir)
+            let l:foudPath = findfile(file, l:prjdir . '/**')
+        endif
+    endif
+
+    if empty(l:foudPath)
+        return
+    end
+
+    if narg == 2
+        let line = target[1]
+        execute 'edit ' . '+' . line . ' ' . file
+    else
+        execute 'edit ' . file
+    endif
+    return 1
+endfunction "}}}
 
 " :EA
 " edit the alt-file of which in the other window
