@@ -32,15 +32,21 @@ function! microcmd#EV#Commander(...) "{{{1
         return 1
     endif
 
+    " try to edit #sharp#function, mainly copied from message
+    " the last #part should function name
+    if l:arg =~# '#'
+        return edit#vim#GotoSharpFunc(l:arg)
+    endif
+
     " search in runtime path
     let l:path = s:FindinRTP(l:arg)
-    if len(l:path) <= 0
-        echo 'cannot find vim file: ' . l:arg
-        return 0
+    if len(l:path) > 0
+        execute 'edit ' . l:path
+        return 1
     endif
-    execute 'edit ' . l:path
-    return 1
 
+    echo 'cannot find vim file: ' . l:arg
+    return 0
 endfunction
 
 " try to find a file in runtime path or it's plugin subdirectory
