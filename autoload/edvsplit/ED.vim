@@ -175,25 +175,25 @@ function! edvsplit#ED#FindInProject(arg) abort "{{{
 
     " 1. find below current directory
     let file = target[0]
-    let l:foudPath = findfile(file, './**,**')
-    if empty(l:foudPath)
+    let l:foundPath = findfile(file, './**,**')
+    if empty(l:foundPath)
         " 2. find below project directory
         let l:exrpt = class#less#rtp#export()
         let l:prjdir = l:exrpt.FindPrject('.')
         if !empty(l:prjdir)
-            let l:foudPath = findfile(file, l:prjdir . '/**')
+            let l:foundPath = findfile(file, l:prjdir . '/**')
         endif
     endif
 
-    if empty(l:foudPath)
+    if empty(l:foundPath)
         return
     end
 
     if narg == 2
         let line = target[1]
-        execute 'edit ' . '+' . line . ' ' . file
+        execute 'edit ' . '+' . line . ' ' . l:foundPath
     else
-        execute 'edit ' . file
+        execute 'edit ' . l:foundPath
     endif
     return 1
 endfunction "}}}
