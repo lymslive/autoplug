@@ -45,7 +45,7 @@ nnoremap \n :SET number<CR>
 nnoremap \p :SET paste<CR>
 nnoremap \w :SET wrap<CR>
 nnoremap \z :SET foldlevel 0 99<CR>
-nnoremap \v :call SET#Toogle('virtualedit', "", 'all')<CR>
+nnoremap \v :call microcmd#SET#Toogle('virtualedit', "", 'all')<CR>
 
 inoremap <F2> <C-R>=expand('%:r')<CR>
 nnoremap <F1> :exec "help ". expand("<cword>")<CR>

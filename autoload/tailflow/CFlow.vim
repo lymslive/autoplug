@@ -12,18 +12,21 @@ endif
 " buffer name 'tail-1', numbered
 let s:fname = 'tail'
 let s:fid = 0
+let s:maxline = 10000
 
 " CLASS:
 let s:class = class#old()
 let s:class._name_ = 'tailflow#CFlow'
 let s:class._version_ = 1
 
-let s:class.path = ''
-let s:class.and = []
-let s:class.not = []
-let s:class.bufname = ''
-let s:class.bufnr = 0
-let s:class.job
+let s:class.cmd = []       " default ['tail', '-f']
+let s:class.path = ''      " file path
+let s:class.and = []       " regexp list that should match
+let s:class.not = []       " regexp list that should not match
+let s:class.bufname = ''   " the output buffer name: tail-1
+let s:class.bufnr = 0      " the output buffer number
+let s:class.job            " the job handled by this object
+let s:class.config = {}    " relation config object
 
 function! tailflow#CFlow#class() abort "{{{
     return s:class
@@ -44,6 +47,8 @@ function! tailflow#CFlow#ctor(this, ...) abort "{{{
     let a:this.bufname = s:fname . '-' . s:fid
     let a:this.and = []
     let a:this.not = []
+    let a:this.cmd = ['tail', '-f']
+    let a:this.config = {}
 endfunction "}}}
 
 " ISOBJECT:
@@ -51,8 +56,22 @@ function! tailflow#CFlow#isobject(that) abort "{{{
     return class#isobject(s:class, a:that)
 endfunction "}}}
 
+" SetCommand: 
+function! s:class.SetCommand(cmd) dict abort "{{{
+    if type(a:cmd) == type([])
+        let self.cmd = a:cmd
+    elseif type(a:cmd) = type('')
+        let self.cmd = split(a:cmd, '\s\+')
+    else
+        :ELOG 'command expect string or list of string'
+    endif
+endfunction "}}}
+
 " GetBuffer: 
-function! s:class.GetBuffer() dict abort "{{{
+function! s:class.GetBuffer(...) dict abort "{{{
+    if a:0 > 0 && a:1 == 0
+        return self.bufnr
+    endif
     return self.bufname
 endfunction "}}}
 
@@ -121,7 +140,7 @@ endfunction "}}}
 
 " Start: 
 function! s:class.Start() dict abort "{{{
-    let l:cmd = ['tail', '-f', self.path]
+    let l:cmd = extend(self.cmd, self.path)
     let l:opt = {}
     let l:opt.out_cb = self.Filter
     let l:opt.err_cb = self.Error
@@ -152,8 +171,11 @@ function! s:class.Filter(channel, msg) dict abort "{{{
         endif
     endfor
 
+    " append output to buffer
+    let l:bCurBuf = v:true
     if bufnr('%') != self.bufnr
-        execute 'buffer ' . self.bufnr
+        execute 'hide buffer ' . self.bufnr
+        let l:bCurBuf = v:false
     endif
 
     let l:bCurEnd = v:true
@@ -162,8 +184,17 @@ function! s:class.Filter(channel, msg) dict abort "{{{
     end
 
     call append(line('$'), a:msg)
-    if l:bCurEnd
+    if l:bCurEnd && l:bCurBuf
         normal! G
+    endif
+
+    if line('$') > s:maxline
+        execute printf('%d,%d delete', 1, float2nr(s:maxline*0.1))
+    endif
+
+    " back to origin buffer
+    if !l:bCurBuf
+        : buffer #
     endif
 
     return v:true

@@ -16,6 +16,6 @@ vnoremap <silent> q :<C-u>call qcmotion#func#VisualMove()<CR>
 onoremap <silent> q :call qcmotion#func#OpendMove()<CR>
 
 " load: 
-function! qcmotion#plugin#load() abort "{{{
+function! qcmotion#plugin#load() abort "{{{ 1
     return 1
 endfunction "}}}
