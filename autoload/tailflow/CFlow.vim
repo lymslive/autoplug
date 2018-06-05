@@ -221,6 +221,19 @@ function! s:class.ChangeFile(path) dict abort "{{{
     let self.path = a:path
 endfunction "}}}
 
+" ChangeCmd: 
+function! s:class.ChangeCmd(cmd) dict abort "{{{
+    if job_status(self.job) ==? 'run'
+        :ELOG 'job is runnig, refused to change command'
+        return -1
+    endif
+    if type(a:cmd) != type([])
+        :ELOG 'cmd expect a list of string'
+        return -1
+    endif
+    let self.cmd = a:cmd
+endfunction "}}}
+
 " LOAD:
 let s:load = 1
 function! tailflow#CFlow#load(...) abort "{{{

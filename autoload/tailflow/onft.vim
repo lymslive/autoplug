@@ -4,17 +4,26 @@
 " Create: 2018-06-04
 " Modify: 2018-06-04
 
-" Flow: 
+" Flow: as ftpluign for flow buffer
 function! tailflow#onft#Flow() abort "{{{
     setlocal buftype=nofile
     setlocal bufhidden=hide
     setlocal noswapfile
+
     command! -buffer -nargs=* And  call tailflow#onft#hAnd(<f-args>)
     command! -buffer -nargs=* Not  call tailflow#onft#hNot(<f-args>)
     command! -buffer -nargs=0 Stop call tailflow#onft#hStop()
     command! -buffer -nargs=0 Run  call tailflow#onft#hRun()
+    command! -buffer -nargs=+ Cmd  call tailflow#onft#hCmd(<f-args>)
     command! -buffer -nargs=1 File call tailflow#onft#hFile(<f-args>)
     command! -buffer -nargs=0 Status call tailflow#onft#hStatus(<f-args>)
+
+    " match or not match the word under cursor
+    " expect a <CR> to comfirm by user
+    nnoremap <buffer> A <Esc>:And <C-R><C-W>
+    nnoremap <buffer> X <Esc>:Not <C-R><C-W>
+    vnoremap <buffer> A y<Esc>:And <C-R>"
+    vnoremap <buffer> X y<Esc>:Not <C-R>"
 endfunction "}}}
 
 " IsFlowBuffer: 
@@ -95,7 +104,18 @@ function! tailflow#onft#hFile(path) abort "{{{
     if !s:IsFlowBuffer()
         return -1
     endif
-    call b:jFlow.File(a:path)
+    call b:jFlow.ChangeFile(a:path)
+endfunction "}}}
+
+" Cmd: 
+function! tailflow#onft#hCmd(...) abort "{{{
+    if !s:IsFlowBuffer()
+        return -1
+    endif
+    if a:0 < 1
+        return -1
+    endif
+    call b:jFlow.ChangeCmd(a:000)
 endfunction "}}}
 
 " Run: 
