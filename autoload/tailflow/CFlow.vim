@@ -19,14 +19,14 @@ let s:class = class#old()
 let s:class._name_ = 'tailflow#CFlow'
 let s:class._version_ = 1
 
-let s:class.cmd = []       " default ['tail', '-f']
-let s:class.path = ''      " file path
-let s:class.and = []       " regexp list that should match
-let s:class.not = []       " regexp list that should not match
-let s:class.bufname = ''   " the output buffer name: tail-1
-let s:class.bufnr = 0      " the output buffer number
-let s:class.job            " the job handled by this object
-let s:class.config = {}    " relation config object
+let s:class.cmd = []        " default ['tail', '-f']
+let s:class.path = ''       " file path
+let s:class.and = []        " regexp list that should match
+let s:class.not = []        " regexp list that should not match
+let s:class.bufname = ''    " the output buffer name: tail-1
+let s:class.bufnr = 0       " the output buffer number
+let s:class.job = v:null    " the job handled by this object
+let s:class.config = v:null " relation config object
 
 function! tailflow#CFlow#class() abort "{{{
     return s:class
@@ -140,7 +140,7 @@ endfunction "}}}
 
 " Start: 
 function! s:class.Start() dict abort "{{{
-    let l:cmd = extend(self.cmd, self.path)
+    let l:cmd = add(self.cmd, self.path)
     let l:opt = {}
     let l:opt.out_cb = self.Filter
     let l:opt.err_cb = self.Error
@@ -151,6 +151,13 @@ function! s:class.Start() dict abort "{{{
         return -1
     endif
     return 0
+endfunction "}}}
+
+" Stop: 
+function! s:class.Stop() dict abort "{{{
+    if type(self.job) == v:t_job
+        call job_stop(self.job)
+    endif
 endfunction "}}}
 
 " Filter: append the stdout from job to the end of buffer
@@ -180,7 +187,7 @@ function! s:class.Filter(channel, msg) dict abort "{{{
 
     let l:bCurEnd = v:true
     if line('.') != line('$')
-        l:bCurEnd = v:false
+        let l:bCurEnd = v:false
     end
 
     call append(line('$'), a:msg)
@@ -203,6 +210,15 @@ endfunction "}}}
 " Error: 
 function! s:class.Error(channel, msg) dict abort "{{{
     :DLOG a:msg
+endfunction "}}}
+
+" ChangeFile: 
+function! s:class.ChangeFile(path) dict abort "{{{
+    if job_status(self.job) ==? 'run'
+        :ELOG 'job is runnig, refused to change file'
+        return -1
+    endif
+    let self.path = a:path
 endfunction "}}}
 
 " LOAD:

@@ -8,8 +8,13 @@
 function! tailflow#onft#Flow() abort "{{{
     setlocal buftype=nofile
     setlocal bufhidden=hide
-    command! -buffer -nargs=* And tailflow#onft#hAnd(<f-arg>)
-    command! -buffer -nargs=* Not tailflow#onft#hNot(<f-arg>)
+    setlocal noswapfile
+    command! -buffer -nargs=* And  call tailflow#onft#hAnd(<f-args>)
+    command! -buffer -nargs=* Not  call tailflow#onft#hNot(<f-args>)
+    command! -buffer -nargs=0 Stop call tailflow#onft#hStop()
+    command! -buffer -nargs=0 Run  call tailflow#onft#hRun()
+    command! -buffer -nargs=1 File call tailflow#onft#hFile(<f-args>)
+    command! -buffer -nargs=0 Status call tailflow#onft#hStatus(<f-args>)
 endfunction "}}}
 
 " IsFlowBuffer: 
@@ -25,7 +30,7 @@ function! tailflow#onft#hAnd(...) abort "{{{
         return -1
     endif
     if a:0 == 0
-        echo b:jFlow.and
+        echomsg b:jFlow.and
     elseif a:0 == 1
         call b:jFlow.AddAndList(a:1)
     else
@@ -54,7 +59,7 @@ function! tailflow#onft#hNot(...) abort "{{{
         return -1
     endif
     if a:0 == 0
-        echo b:jFlow.not
+        echomsg b:jFlow.not
     elseif a:0 == 1
         call b:jFlow.AddNotList(a:1)
     else
@@ -75,4 +80,40 @@ function! tailflow#onft#hNot(...) abort "{{{
             endfor
         endif
     endif
+endfunction "}}}
+
+" Stop: 
+function! tailflow#onft#hStop() abort "{{{
+    if !s:IsFlowBuffer()
+        return -1
+    endif
+    call b:jFlow.Stop()
+endfunction "}}}
+
+" File: 
+function! tailflow#onft#hFile(path) abort "{{{
+    if !s:IsFlowBuffer()
+        return -1
+    endif
+    call b:jFlow.File(a:path)
+endfunction "}}}
+
+" Run: 
+function! tailflow#onft#hRun() abort "{{{
+    if !s:IsFlowBuffer()
+        return -1
+    endif
+    if job_status(b:jFlow.job) ==? 'run'
+        :ELOG 'job is already runnig'
+        return 0
+    endif
+    call b:jFlow.Start()
+endfunction "}}}
+
+" Status: just show the job status in message 
+function! tailflow#onft#hStatus() abort "{{{
+    if !s:IsFlowBuffer()
+        return -1
+    endif
+    echomsg b:jFlow.job
 endfunction "}}}
