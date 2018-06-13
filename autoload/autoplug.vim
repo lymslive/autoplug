@@ -14,11 +14,7 @@ let s:path = expand('<sfile>:p:h')
 " Command:
 " :PI xxx yyy zzz
 function! autoplug#load(...) abort "{{{
-    if a:0 == 0
-        return
-    endif
-
-    if empty(a:1)
+    if a:0 == 0 || empty(a:1)
         return
     endif
 
@@ -33,7 +29,7 @@ function! autoplug#load(...) abort "{{{
         try
             call {l:name}#plugin#load()
         catch 
-            echomsg 'has no autoplug: ' . l:name
+            echomsg 'fail to autoplug: ' . l:name
             continue
         endtry
     endfor
