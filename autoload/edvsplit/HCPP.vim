@@ -10,7 +10,8 @@ let s:FileName = ''
 let s:ClassName = ''
 
 " regexp to match a function line
-let s:FunctionPattern = '\(\w\+\)\s\+\([A-Za-z_0-9:]\+\)\s*(\(.*\))'
+" let s:FunctionPattern = '\(\w\+\)\s\+\([A-Za-z_0-9:]\+\)\s*(\(.*\))'
+let s:FunctionPattern = '\(\w\+\)[ *]\+\([A-Za-z_0-9:]\+\)\s*(\(.*\))'
 let s:dFunction = {'Return':1, 'LongName':2, 'Parameter':3}
 
 let s:MemberPattern = '\(\w\+\)\s\+\(\w\+\)'
