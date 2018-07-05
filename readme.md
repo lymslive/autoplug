@@ -61,6 +61,8 @@ $ git clone https://github.com/lymslive/autoplug.git
 :PI xxx
 :PI yyy
 :PI zzz
+" 也可以写成一行
+:PI xxx yyy zzz
 ```
 
 目前，`:PI` 命令支持有限补全，可补全本库及 `~/.vim` 目录下 `autoload/` 的子目
