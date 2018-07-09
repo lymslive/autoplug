@@ -34,6 +34,10 @@ command! -nargs=* -complete=option SET call microcmd#SET#Toogle(<f-args>)
 " one args: register x use `p`, -x use `P`, ! is after normal
 command! -nargs=? -bang P call microcmd#PASTE#Commander("<bang>", <f-args>)
 
+" open terminal in new tabpage or vertical split window
+command! -nargs=* TT tab terminal <args>
+command! -nargs=* TV vertical terminal <args>
+
 " Remap: {{{1
 " Toogle Set Maps:
 nnoremap \s :SET<CR>

@@ -132,6 +132,13 @@ endfunction
 
 " jump to another window, asume it is editing alt file
 function! s:JumpToAnotherFile(target_ft) " {{{1
+    let l:extension = ''
+    if a:target_ft == s:FileType_Source
+        let l:extension = '.c*'
+    elseif a:target_ft == s:FileType_Header
+        let l:extension = '.h*'
+    endif
+
 	let l:wincnt = winnr('$')
 	if l:wincnt == 2
 		wincmd w
@@ -140,10 +147,18 @@ function! s:JumpToAnotherFile(target_ft) " {{{1
 		let l:anothername = expand('%:t:r')
 		if l:anothername !=# s:FileName
 			wincmd p
-			call edvsplit#AB#EditAltFile(expand("%:p"))
+            if empty(l:extension)
+                call edvsplit#AB#EditAltFile(expand("%:p"))
+            else
+                call edvsplit#AB#EditAltFile(expand("%:p"), l:extension)
+            endif
 		endif
 	else
-        call edvsplit#ED#EditAltInAnother()
+        if empty(l:extension)
+            call edvsplit#ED#EditAltInAnother()
+        else
+            call edvsplit#ED#EditAltInAnother(l:extension)
+        endif
 	endif
 endfunction
 

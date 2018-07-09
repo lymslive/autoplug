@@ -29,6 +29,7 @@ command! -nargs=* -count=0 T call usetabpg#func#jumpalt(<count>, <f-args>)
 " :help gt to see the default gt behavior
 nnoremap gt :call usetabpg#func#jumpalt()<CR>
 nnoremap gT :tabnew<CR>
+tnoremap <C-W>t <C-W>:call usetabpg#func#jumpalt()<CR>
 
 " *gn* directly jump to the n-th tabpage
 " :help g8 :help g0 to see the default behavior
