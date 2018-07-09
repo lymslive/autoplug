@@ -24,6 +24,8 @@ function! tailflow#onft#Flow() abort "{{{
     nnoremap <buffer> X <Esc>:Not <C-R><C-W>
     vnoremap <buffer> A y<Esc>:And <C-R>"
     vnoremap <buffer> X y<Esc>:Not <C-R>"
+
+    command! -buffer -nargs=0 JsonBreak call tailflow#logjson#SimpleBreak(<f-args>)
 endfunction "}}}
 
 " IsFlowBuffer: 
