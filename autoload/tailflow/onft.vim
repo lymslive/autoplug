@@ -9,13 +9,14 @@ function! tailflow#onft#Flow() abort "{{{
     setlocal buftype=nofile
     setlocal bufhidden=hide
     setlocal noswapfile
+    setlocal textwidth=0
 
     command! -buffer -nargs=* And  call tailflow#onft#hAnd(<f-args>)
     command! -buffer -nargs=* Not  call tailflow#onft#hNot(<f-args>)
     command! -buffer -nargs=0 Stop call tailflow#onft#hStop()
     command! -buffer -nargs=0 Run  call tailflow#onft#hRun()
-    command! -buffer -nargs=+ Cmd  call tailflow#onft#hCmd(<f-args>)
-    command! -buffer -nargs=1 File call tailflow#onft#hFile(<f-args>)
+    command! -buffer -nargs=* Cmd  call tailflow#onft#hCmd(<f-args>)
+    command! -buffer -nargs=* File call tailflow#onft#hFile(<f-args>)
     command! -buffer -nargs=0 Status call tailflow#onft#hStatus(<f-args>)
 
     " match or not match the word under cursor
@@ -25,7 +26,13 @@ function! tailflow#onft#Flow() abort "{{{
     vnoremap <buffer> A y<Esc>:And <C-R>"
     vnoremap <buffer> X y<Esc>:Not <C-R>"
 
+    " format one line json string in log file
     command! -buffer -nargs=0 JsonBreak call tailflow#logjson#SimpleBreak(<f-args>)
+    nnoremap <buffer> J <Esc>:JsonBreak<CR>
+    if executable('clang-format')
+        nnoremap <buffer> K <Esc>V:!clang-format -style=LLVM<CR>
+        vnoremap <buffer> K :!clang-format -style=LLVM<CR>
+    endif
 endfunction "}}}
 
 " IsFlowBuffer: 
@@ -41,7 +48,7 @@ function! tailflow#onft#hAnd(...) abort "{{{
         return -1
     endif
     if a:0 == 0
-        echomsg b:jFlow.and
+        echo b:jFlow.and
     elseif a:0 == 1
         call b:jFlow.AddAndList(a:1)
     else
@@ -70,7 +77,7 @@ function! tailflow#onft#hNot(...) abort "{{{
         return -1
     endif
     if a:0 == 0
-        echomsg b:jFlow.not
+        echo b:jFlow.not
     elseif a:0 == 1
         call b:jFlow.AddNotList(a:1)
     else
@@ -101,12 +108,17 @@ function! tailflow#onft#hStop() abort "{{{
     call b:jFlow.Stop()
 endfunction "}}}
 
-" File: 
-function! tailflow#onft#hFile(path) abort "{{{
+" File: echo or set log file
+function! tailflow#onft#hFile(...) abort "{{{
     if !s:IsFlowBuffer()
         return -1
     endif
-    call b:jFlow.ChangeFile(a:path)
+    if a:0 < 1
+        echo b:jFlow.GetFile()
+        return
+    endif
+    let l:path = a:1
+    call b:jFlow.ChangeFile(l:path)
 endfunction "}}}
 
 " Cmd: 
@@ -115,7 +127,8 @@ function! tailflow#onft#hCmd(...) abort "{{{
         return -1
     endif
     if a:0 < 1
-        return -1
+        echo b:jFlow.GetCmd()
+        return 0
     endif
     call b:jFlow.ChangeCmd(a:000)
 endfunction "}}}

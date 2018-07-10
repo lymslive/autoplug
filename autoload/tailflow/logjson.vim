@@ -18,5 +18,6 @@ function! tailflow#logjson#SimpleBreak() abort "{{{
     : substitute/[{,]\zs\s*/\r/g
     " go back origin line
     execute l:iLine
-    normal f{=%
+    call search('{')
+    normal =%
 endfunction "}}}
