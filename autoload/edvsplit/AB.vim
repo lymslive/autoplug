@@ -4,7 +4,8 @@
 "
 
 " Ignore some extensions
-let s:wildignore_default = "*.o,*.obj,*.out,*.exe"
+" add *.d output of cpp(The C Preprocessor)
+let s:wildignore_default = "*.o,*.obj,*.out,*.exe,*.d"
 
 " Find a alternative file in one path.
 " IN: a:file, filename without path
@@ -26,7 +27,7 @@ function! edvsplit#AB#FindAltInPath(file, path, ...) " {{{1
 	let basename = fnamemodify(a:file, ":t:r")
 	let globstring = a:path . '/' . basename . extspec
 	" echomsg "glob files: " . globstring
-	let gfiles = glob(globstring, 1, 1)
+	let gfiles = glob(globstring, 0, 1)
 	if len(gfiles) > 0
 		for i in range(0, len(gfiles)-1) 
 			if fnamemodify(gfiles[i], ":t") !=# fnamemodify(a:file, ":t")
@@ -35,7 +36,7 @@ function! edvsplit#AB#FindAltInPath(file, path, ...) " {{{1
 			endif
 		endfor
 	else
-		let gfiles = glob(a:path . '/' . basename, 1, 1)
+		let gfiles = glob(a:path . '/' . basename, 0, 1)
 		if len(gfiles) > 0
             let filefound = gfiles[0]
 		endif
