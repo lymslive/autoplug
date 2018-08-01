@@ -20,6 +20,8 @@ if has('terminal')
     tnoremap <C-W>0 <C-W>:$tabNext<CR>
 endif
 
+command! -nargs=* -bang Shell call useterm#shell#SendShellCmd(<bang>0, <q-args>)
+
 command! -nargs=+ MysqlTable echo useterm#mysql#MysqlTable(<f-args>)
 command! -nargs=+ MysqlExecute echo useterm#mysql#MysqlExecute(<f-args>)
 
