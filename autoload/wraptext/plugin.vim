@@ -62,6 +62,8 @@ inoremap { {}<Left>
 inoremap } {}
 " inoremap ) ()
 inoremap ] []
+" inoremap    <buffer>  {<CR>  {<CR>}<Esc>O
+" vnoremap    <buffer>  {<CR> s{<CR>}<Esc>kp=iB
 
 " load:  "{{{1
 function! wraptext#plugin#load() abort "{{{
