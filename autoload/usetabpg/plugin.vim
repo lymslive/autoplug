@@ -15,7 +15,9 @@ endif
 
 " Option Setting: {{{1
 " custom tabline with much useful indicative information
-set tabline=%!usetabpg#func#CustTabLine()
+if !exists('$SPACEVIM')
+    set tabline=%!usetabpg#func#CustTabLine()
+endif
 " don't use GUI tabline
 " set guioptions-=e
 

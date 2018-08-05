@@ -80,6 +80,11 @@ function! s:class.GetFile() dict abort "{{{
     return self.path
 endfunction "}}}
 
+" GetCmd: 
+function! s:class.GetCmd() dict abort "{{{
+    return self.cmd
+endfunction "}}}
+
 " SetAndList: 
 function! s:class.SetAndList(list) dict abort "{{{
     if type(a:list) != type([])
@@ -140,7 +145,9 @@ endfunction "}}}
 
 " Start: 
 function! s:class.Start() dict abort "{{{
-    let l:cmd = add(self.cmd, self.path)
+    " let l:cmd = add(self.cmd, self.path)
+    let l:cmd = copy(self.cmd)
+    call add(l:cmd, self.path)
     let l:opt = {}
     let l:opt.out_cb = self.Filter
     let l:opt.err_cb = self.Error

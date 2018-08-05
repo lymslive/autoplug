@@ -12,13 +12,13 @@ endif
 
 " Plugin Seeting: {{{1
 " command define
-command! -narg=?  Space call Spacebar#SpaceModeSelect(<f-args>)
+command! -narg=?  Space call spacebar#func#SpaceModeSelect(<f-args>)
 
 " Make \<Space> map, cycle switch the space mode.
 noremap \<Space> :Space<CR>
 
 " in ftplugin/cpp.vim
-" call Spacebar#SpaceModeSelect('Cpp')
+" call spacebar#SpaceModeSelect('Cpp')
 " load: 
 function! spacebar#plugin#load() abort "{{{
     return 1
