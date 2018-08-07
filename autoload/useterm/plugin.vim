@@ -20,10 +20,23 @@ if has('terminal')
     tnoremap <C-W>0 <C-W>:$tabNext<CR>
 endif
 
+" Shell:
+" send shell command to a terminal shell, open a new one if no terminal
+" may from another tabpage and/or window
+" add `!` won't jump to the terminal window
 command! -nargs=* -bang Shell call useterm#shell#SendShellCmd(<bang>0, <q-args>)
+" Tcd:
+" make the terminal cd to current file directory from which this cmd executed
+command! -nargs=* Tcd call useterm#shell#SendShellCmd(0, 'cd ' . expand('%:p'))
 
+" MysqlTable:
+" show basic information (desc and count(*)) of a table
 command! -nargs=+ MysqlTable echo useterm#mysql#MysqlTable(<f-args>)
-command! -nargs=+ MysqlExecute echo useterm#mysql#MysqlExecute(<f-args>)
+" MysqlExecute:
+" like mysql -e 'sql statement' from shell cmdline
+" 1st argument must be quoted 'sql statement'
+" 2nd argument is optional switches pass to mysql, default -B
+command! -nargs=+ MysqlExecute echo useterm#mysql#QuickExecute(<f-args>)
 
 " load: 
 function! useterm#plugin#load() abort "{{{
