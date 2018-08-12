@@ -37,12 +37,12 @@ endfunction "}}}
 " QuickExecute: 
 function! useterm#mysql#QuickExecute(sql, ...) abort "{{{
     let l:format = get(a:000, 0, 'B')
-    let l:cmd = printf("%s -%se %s", s:BuildCmdline(), l:format, shellescape(a:sql))
+    let l:cmd = printf("%s %s -e %s", s:BuildCmdline(), l:format, shellescape(a:sql))
     return system(l:cmd)
 endfunction "}}}
 
 " MysqlTable: 
 function! useterm#mysql#MysqlTable(table) abort "{{{
     let l:sql = printf('desc %s; select count(*) from %s;', a:table, a:table)
-    return useterm#mysql#QuickExecute(l:sql, 't')
+    return useterm#mysql#QuickExecute(l:sql, '-t')
 endfunction "}}}
