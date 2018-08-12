@@ -55,7 +55,8 @@ vimrc 代表着个人当前使用的 vim 全局配置，`ftplugin/*.vim`则代�
 EV 的命名，可记为 Edit Vim file，也可认为是 Environment （环境）。
 
 * `:EV [one-arg]` 如果带一个参数，则将在 &rtp(runtimepath) 路径及其 plugin/ 子目
-  录下查找相关的 .vim 文件，若找到则打开编辑。支持 Tab 补全。
+  录下查找相关的 .vim 文件，若找到则打开编辑。支持 Tab 补全。如果参数是带 `#`
+  的自动加载函数，则会搜索该函数的定义并打开（包括未加载的 `pack/*/opt` 目录）。
 
 * `:EV ,` 一个逗号作为参数，执行 `:UltiSnipsEdit` 快捷命令，编辑与当前文件类型相
   关的 snips 文件。需要安装[UltiSnips](https://github.com/SirVer/ultisnips)插
@@ -136,23 +137,36 @@ P 命令也可再带一个参数，用于指定寄存器名，这一般在执行
 从外面往运行在终端的 vim 复制文本时，可能需要 `set paste` 以获得正确的结果。为
 了临时设置这个选项，可将 `set` 替换为上述的 `SET` 命令。
 
+### CD: 改变路径命令
+
+整合 [autojump](https://github.com/wting/autojump)
+的目录功能，使用 `:lcd` 只改变当前窗口的路径
+
+* `:CD` 回到 `~/.vim`
+* `:CD .` 切换至当前编辑文档的路径，相当于 `&autochir` 选项
+* `:CD /` 上溯回到项目根目录，如包含 `.git` 的目录
+* `:CD -` 相当于 `:lcd -`
+* `:CD ?` 列出 `autojump -s` 已记录的数据库
+* `:CD path` 先用 autojump 查找快速进入的目录，再调用常规的 `lcd` 命令（所以也
+  支持 `&cdpath` 配置），如果用常规 `lcd` 进入，则将新目录添加至 autojump 库。
+  也支持多参数传给 autojump 。
+
+如果没安装 autojump 也能用除此之外的功能。另外，单参数时在搜索 autojump 前还是
+会先尝试 `~/.vim` 子目录的，如果全匹配的话。
+
+### Q: 退出命令 
+
+`:Q` 用于关闭整个标签页，相当于 `:tabclose`
+
+
+### T: 终端系列命令
+
+`:term` 默认是水平上下分隔窗口打开内置终端的
+`:TV` 按垂直分隔窗口打开内置终端
+`:TT` 在新标签页打开内置终端
+
 ## 安装使用
 
 我不再为这类小功能插件维护独立仓库了。先安装 `autoplug`，然后 `:PI microcmd`
 可开启这里的功能命令。
 
-<!--
-按常用插件管理机制下载安装即可。
-[vundle](https://github.com/VundleVim/Vundle.vim) 或
-[pathogen](https://github.com/tpope/vim-pathogen) 都是好东西。
-
-手动安装的话，也建议下载到独立的文件目录中，并将其加入到 `&rtp` （vim 运行时文
-件路径）中。即只需在 vimrc 中加入如下一行：
-```
-set rtp+=~/any/download/path
-```
-其实 vundle 或 pathogen 也会做这事，但做得更多。
-
-本插件的 `plugin/*.vim` 允许被修改定制，或另存为 `setlocal.vim` 再作修改定制。
-比如使用其他字母作为命令名，或增加键映射到某些命令。
--->

@@ -1,14 +1,6 @@
 " MicroCommand.vim
 "   interfaces (options, maps, commands) of this plugin
-" Author: lymslive / 2016-08-27
-
-" Load Control: 
-let s:thispath = fnamemodify(expand("<sfile>"), ":p:h")
-if filereadable(s:thispath . '/' . 'setlocal.vim') 
-    if fnamemodify(expand("<sfile>"), ":t:r") !=? 'setlocal'
-        finish
-    endif
-endif
+" Author: lymslive / 2018-08-12
 
 " Command: {{{1
 
@@ -40,6 +32,10 @@ command! -nargs=0 Q tabclose
 " open terminal in new tabpage or vertical split window
 command! -nargs=* TT tab terminal <args>
 command! -nargs=* TV vertical terminal <args>
+
+" CD:
+" lcd with autojump funs
+command! -nargs=* -complete=dir CD call microcmd#CD#Commander(<f-args>)
 
 " Remap: {{{1
 " Toogle Set Maps:

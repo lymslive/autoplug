@@ -156,6 +156,15 @@ function! edvsplit#AB#EditAltFile(file, ...) " {{{1
 	if a:0 > 0
 		let extspec = a:1
 	else
+        " special filetype handle
+        if &filetype ==? 'c' || &filetype ==? 'cpp'
+            let l:ext = fnamemodify(a:file, ':e')
+            if l:ext =~? '^c'
+                let extspec = '.h'
+            elseif l:ext =~? '^h'
+                let extspec = '.c'
+            endif
+        endif
 		let extspec = ""
 	endif
 	let altfile = edvsplit#AB#FindAltFile(a:file, extspec)
