@@ -1,6 +1,6 @@
 " Author: lymslive
 " Create: 2016-03-8
-" Last Modify: 2017-08-11
+" Last Modify: 2018-08-16
 "
 
 " Ignore some extensions
@@ -19,7 +19,7 @@ function! edvsplit#AB#FindAltInPath(file, path, ...) " {{{1
 
 	let filefound = ""
 	if a:0 > 0 && strlen(a:1) > 0
-		let extspec = a:1
+		let extspec = a:1 . "*"
 	else
 		let extspec = ".*"
 	endif
@@ -156,6 +156,7 @@ function! edvsplit#AB#EditAltFile(file, ...) " {{{1
 	if a:0 > 0
 		let extspec = a:1
 	else
+        let extspec = ""
         " special filetype handle
         if &filetype ==? 'c' || &filetype ==? 'cpp'
             let l:ext = fnamemodify(a:file, ':e')
@@ -165,7 +166,6 @@ function! edvsplit#AB#EditAltFile(file, ...) " {{{1
                 let extspec = '.c'
             endif
         endif
-		let extspec = ""
 	endif
 	let altfile = edvsplit#AB#FindAltFile(a:file, extspec)
 	if strlen(altfile) > 0
