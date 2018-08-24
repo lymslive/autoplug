@@ -66,7 +66,8 @@ function! s:VimhomeCD(path) abort "{{{
     let l:rtp = class#less#rtp#export()
     let l:full = l:rtp.AddPath($VIMHOME, a:path)
     if isdirectory(l:full)
-        execute lcd l:full
+        execute 'lcd' l:full
+        echo l:full
         return v:true
     else
         return v:false
@@ -81,6 +82,7 @@ function! s:AutojumpCD(path) abort "{{{
         return v:false
     endif
     execute 'lcd' l:auto
+    echo l:auto
     return v:true
 endfunction "}}}
 
@@ -108,6 +110,7 @@ function! s:DefaultCD(path) abort "{{{
     let l:new = getcwd()
     if l:new !=# l:old
         call microcmd#CD#Autojump('-a', l:new)
+        echo l:new
         return v:true
     else
         return v:false

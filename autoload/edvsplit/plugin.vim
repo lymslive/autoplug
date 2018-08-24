@@ -2,15 +2,6 @@
 "   interfaces (options, maps, commands) of using tow windows
 " Author: lymslive / 2016-03
 
-" Name Explain
-" Load Control: {{{ 1
-let s:thispath = fnamemodify(expand("<sfile>"), ":p:h")
-if filereadable(s:thispath . '/' . 'setlocal.vim') 
-    if fnamemodify(expand("<sfile>"), ":t:r") !=? 'setlocal'
-	finish
-    endif
-endif
-
 " Map Define UI: {{{1
 " the maped rhs is uer defined commands, see the next section
 
