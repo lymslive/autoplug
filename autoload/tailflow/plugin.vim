@@ -6,6 +6,16 @@
 
 command! -nargs=+ -complete=file Tail call tailflow#cmdu#hStart(<f-args>)
 
+" SepLine: append a separate line to view log clearer
+function! s:SepLine(...) abort "{{{
+    let l:leng = get(a:000, 0, '78')
+    let l:char = get(a:000, 1, '-')
+    let l:line = repeat(l:char, l:leng)
+    call append(line('$'), ['', l:line, ''])
+    normal! G
+endfunction "}}}
+command! -nargs=* -complete=file SepLine call s:SepLine(<f-args>)
+
 " load: 
 function! tailflow#plugin#load() abort "{{{
     return 1
