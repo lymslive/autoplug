@@ -40,10 +40,10 @@ function! tailflow#cmdu#hStart(...) abort "{{{
         call l:jFlow.SetCommand(l:lsCmd)
     endif
     if !empty(l:lsAnd)
-        call l:jFlow.SetAndList()
+        call l:jFlow.SetAndList(l:lsAnd)
     endif
     if !empty(l:lsNot)
-        call l:jFlow.SetNotList()
+        call l:jFlow.SetNotList(l:lsNot)
     endif
 
     if 0 != l:jFlow.Start()
