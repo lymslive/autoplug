@@ -35,7 +35,7 @@ function! microcmd#EV#Commander(...) "{{{1
     " try to edit #sharp#function, mainly copied from message
     " the last #part should function name
     if l:arg =~# '#'
-        return edit#vim#GotoSharpFunc(l:arg)
+        return debug#lookup#GotoSharpFunc(l:arg)
     endif
 
     " search in runtime path

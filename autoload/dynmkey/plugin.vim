@@ -9,7 +9,7 @@ nnoremap <CR> q:k
 nnoremap ? q/k
 augroup DynmkeyEvent
     autocmd CmdwinEnter * call dynmkey#cmdwin#OnEnter()
-    autocmd CmdwinLeave * call dynmkey#cmdwin#OnEnter()
+    autocmd CmdwinLeave * call dynmkey#cmdwin#OnLeave()
 augroup END
 
 command -nargs=1 -bang Normal call dynmkey#normal#Unmap('<bang>', <q-args>)

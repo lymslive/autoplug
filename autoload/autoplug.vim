@@ -29,7 +29,7 @@ function! autoplug#load(...) abort "{{{
         try
             call {l:name}#plugin#load()
         catch 
-            echomsg 'fail to autoplug: ' . l:name
+            echoerr 'fail to autoplug: ' . l:name
             continue
         endtry
     endfor
@@ -49,3 +49,4 @@ function! autoplug#complete(ArgLead, CmdLine, CursorPos) abort "{{{
 endfunction "}}}
 
 command! -nargs=* -complete=customlist,autoplug#complete PI call autoplug#load(<f-args>)
+command! -nargs=1 SOURCE execute 'source ' . expand('<sfile>:p:h') . '/' . <q-args>
