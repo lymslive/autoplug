@@ -192,6 +192,7 @@ function! s:meskey_CR() abort "{{{
         endif
         call map(l:lsTrace, '"[trace] .. " . v:val')
         call append('.', l:lsTrace)
+        normal! j
     elseif l:sLine =~ '^\[trace\] .. '
         let l:sTrace = matchstr(l:sLine, '^\[trace\] .. \zs\S\+\ze')
         call s:stack_locate(l:sTrace)

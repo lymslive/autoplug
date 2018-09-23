@@ -33,23 +33,27 @@ endfunction "}}}
 command! -nargs=1 LOGUP call debug#log#up(<f-args>)
 
 " command: 
-function! debug#log#command(msg, level, style) abort "{{{
+function! debug#log#command(notrace, msg, level, style) abort "{{{
     let l:time = strftime("%Y%m%d %T")
     if a:level < len(s:LEVEL_NAME)
         let l:label = s:LEVEL_NAME[a:level]
     else
         let l:label = s:LEVEL_NAME[-1]
     endif
-    let l:stack = s:backtrace(2)
-    let l:msg = printf('[%s][%s](%s) %s', l:time, l:label, l:stack, a:msg)
+    if notrace
+        let l:msg = printf('[%s][%s] %s', l:time, l:label, a:msg)
+    else
+        let l:stack = s:backtrace(2)
+        let l:msg = printf('[%s][%s](%s) %s', l:time, l:label, l:stack, a:msg)
+    endif
     call s:loger.log(l:msg, a:level, a:style)
 endfunction "}}}
 
-command! -nargs=+ -count=0 LOG call debug#log#command(eval(<q-args>), <count>, 'Comment')
-command! -nargs=+ ELOG call debug#log#command(eval(<q-args>), 0, 'ErrorMsg')
-command! -nargs=+ DLOG call debug#log#command(eval(<q-args>), 1, 'WarningMsg')
-command! -nargs=+ WLOG call debug#log#command(eval(<q-args>), 2, 'WarningMsg')
-command! -nargs=+ -count=0 SLOG call debug#log#command(<q-args>, <count>, 'Comment')
+command! -nargs=+ -bang -count=0 LOG call debug#log#command(<bang>0, eval(<q-args>), <count>, 'Comment')
+command! -nargs=+ -bang ELOG call debug#log#command<bang>0, (eval(<q-args>), 0, 'ErrorMsg')
+command! -nargs=+ -bang DLOG call debug#log#command(<bang>0, eval(<q-args>), 1, 'WarningMsg')
+command! -nargs=+ -bang WLOG call debug#log#command(<bang>0, eval(<q-args>), 2, 'WarningMsg')
+command! -nargs=+ -bang -count=0 SLOG call debug#log#command(<bang>0, <q-args>, <count>, 'Comment')
 
 " create_logbuffer: 
 function! s:logbuffer() abort "{{{

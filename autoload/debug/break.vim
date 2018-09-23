@@ -29,7 +29,7 @@ function! debug#break#command(...) abort "{{{
 
     let l:pFileName = expand('%:p')
     let l:iLineNumber = line('.')
-    return s:Breakilec(l:pFileName, l:iLineNumber)
+    return s:BreakFile(l:pFileName, l:iLineNumber)
 endfunction "}}}
 
 " CheckInFunction: check if cursor in a function
@@ -111,7 +111,7 @@ function! s:BreakFunc(func, ...) abort "{{{
 endfunction "}}}
 
 " BreakFile: 
-function! s:Breakilec(file, ...) abort "{{{
+function! s:BreakFile(file, ...) abort "{{{
     if a:0 > 0 && a:1 > 0
         let l:cmd = printf('breakadd file %d %s', a:1, a:file)
     else
