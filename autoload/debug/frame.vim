@@ -22,10 +22,10 @@ endfunction "}}}
 
 " stack_list: split <sfile> by ..
 function! s:stack_list(sTrace) abort "{{{
-    if a:sTrace !~# '^\s*function\s+'
+    if a:sTrace !~# '^\s*function\s\+'
         return []
     endif
-    let l:sTrace = substitute(a:sTrace, '^\s*function\s+', '', '')
+    let l:sTrace = substitute(a:sTrace, '^\s*function\s\+', '', '')
     let l:stacks = split(l:sTrace, '\.\.')
     return l:stacks
 endfunction "}}}

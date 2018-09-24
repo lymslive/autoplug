@@ -10,7 +10,7 @@ let s:backtrace = package#imports('debug#frame', 'backtrace')
 let s:mesmap = package#imports('debug#message', 'mesmap')
 
 let s:LEVEL_NAME = ['ERR', 'DBG', 'WARN', 'INFO']
-let s:LOGBUFFER_NAME = '[VIMLOG]'
+let s:LOGBUFFER_NAME = '-VIMLOG-'
 
 " :LOGON      |" start to log to a vim buffer
 " :LOGON file |" start go log to file
@@ -40,7 +40,7 @@ function! debug#log#command(notrace, msg, level, style) abort "{{{
     else
         let l:label = s:LEVEL_NAME[-1]
     endif
-    if notrace
+    if a:notrace
         let l:msg = printf('[%s][%s] %s', l:time, l:label, a:msg)
     else
         let l:stack = s:backtrace(2)

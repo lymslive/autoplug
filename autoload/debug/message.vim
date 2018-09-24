@@ -8,10 +8,10 @@ function! debug#message#package() abort "{{{
     return s:
 endfunction "}}}
 
-USE ./frame.vim
+USE! ./frame.vim
 
 let s:lsMessage = []
-let s:MESBUFFER_NAME = '[Message]'
+let s:MESBUFFER_NAME = '-Message-'
 let s:MESBUFFER_HEIGHT = 15
 
 " Func: s:list 
@@ -68,7 +68,7 @@ function! s:go_meswin() abort "{{{
         botright split
         execute 'buffer' s:mesbuf()
         if winheight(0) > s:MESBUFFER_HEIGHT
-            resize s:MESBUFFER_HEIGHT
+            execute 'resize' s:MESBUFFER_HEIGHT
         endif
         let l:winnr = bufwinnr(s:mesbuf())
     endif
@@ -90,7 +90,11 @@ function! s:mesview(count) abort "{{{
         return
     endif
 
-    call s:go_meswin()
+    if s:go_meswin() <= 0
+        :DLOG 'fails to go message window'
+        return
+    end
+
     1,$ delete
     call append(0, l:lsMessage)
 
