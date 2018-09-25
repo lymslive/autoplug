@@ -10,7 +10,7 @@ let s:backtrace = package#imports('debug#frame', 'backtrace')
 let s:mesmap = package#imports('debug#message', 'mesmap')
 
 let s:LEVEL_NAME = ['ERR', 'DBG', 'WARN', 'INFO']
-let s:LOGBUFFER_NAME = '-VIMLOG-'
+let s:LOGBUFFER_NAME = '.VIMLOG.buf'
 
 " :LOGON      |" start to log to a vim buffer
 " :LOGON file |" start go log to file

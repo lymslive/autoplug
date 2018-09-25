@@ -11,7 +11,7 @@ endfunction "}}}
 USE! ./frame.vim
 
 let s:lsMessage = []
-let s:MESBUFFER_NAME = '-Message-'
+let s:MESBUFFER_NAME = '.MESSAGE.buf'
 let s:MESBUFFER_HEIGHT = 15
 
 " Func: s:list 
@@ -63,6 +63,8 @@ endfunction "}}}
 
 " Func: s:go_meswin 
 function! s:go_meswin() abort "{{{
+    let l:wincur = winnr()
+
     let l:winnr = bufwinnr(s:mesbuf())
     if l:winnr == -1
         botright split
@@ -72,6 +74,11 @@ function! s:go_meswin() abort "{{{
         endif
         let l:winnr = bufwinnr(s:mesbuf())
     endif
+
+    if l:winnr != -1 && l:winnr != l:wincur
+        execute l:winnr . 'wincmd w'
+    endif
+
     return l:winnr
 endfunction "}}}
 

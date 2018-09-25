@@ -34,7 +34,7 @@ endfunction "}}}
 " try locate to stack intem string {function-name1}[{lnum}]
 " the source script will load in the previous window if any.
 function! s:stack_locate(sTrace) abort "{{{
-    let l:lsMatch = matchlist(a:sTrace, '\(\S\+\)\[\(\d\+\)\]')
+    let l:lsMatch = matchlist(a:sTrace, '\(\S\+\)\(\[\d\+\]\)\?')
     if len(l:lsMatch) < 2+1
         echoerr 'Invalid trace format: ' . a:sTrace
     endif
@@ -70,7 +70,7 @@ function! s:goto_sharp_func(sFuncName, iFuncLine) abort "{{{
 
     :wincmd p
     execute 'hide edit ' . l:pFilePath
-    if search(a:sFuncName, 'scew')
+    if search(a:sFuncName, 'scew') && !empty(a:iFuncLine)
         execute 'normal! ' . (0+a:iFuncLine) . 'j'
     endif 
 endfunction "}}}
@@ -90,7 +90,7 @@ function! s:goto_sid_func(sFuncName, iFuncLine) abort "{{{
     execute 'hide edit ' . l:pFilePath
     let l:sPattern = '^\s*function!\?\s\+%s\>'
     let l:sPattern = printf(l:sPattern, 's:' . l:sFuncName)
-    if search(l:sPattern, 'scew')
+    if search(l:sPattern, 'scew') && !empty(a:iFuncLine)
         execute 'normal! ' . (0+a:iFuncLine) . 'j'
     endif 
 endfunction "}}}
