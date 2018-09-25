@@ -35,12 +35,12 @@ endfunction "}}}
 " the source script will load in the previous window if any.
 function! s:stack_locate(sTrace) abort "{{{
     let l:lsMatch = matchlist(a:sTrace, '\(\S\+\)\[\(\d\+\)\]')
-    if len(l:lsMatch) < 2
+    if len(l:lsMatch) < 2+1
         echoerr 'Invalid trace format: ' . a:sTrace
     endif
 
-    let l:sFuncName = l:lsMatch[0]
-    let l:iFuncLine = l:lsMatch[1]
+    let l:sFuncName = l:lsMatch[1]
+    let l:iFuncLine = l:lsMatch[2]
 
     if l:sFuncName =~# '#'
         return s:goto_sharp_func(l:sFuncName, l:iFuncLine)
@@ -53,7 +53,7 @@ endfunction "}}}
 
 " goto_sharp_func: 
 function! s:goto_sharp_func(sFuncName, iFuncLine) abort "{{{
-    let l:split = split(l:sFuncName, '#')
+    let l:split = split(a:sFuncName, '#')
     let l:sFuncName = remove(l:split, -1)
     let l:pFileName = join(l:split, s:SLASH) . '.vim'
     let l:lsVimfile = s:PACK.scripts()
@@ -76,12 +76,12 @@ function! s:goto_sharp_func(sFuncName, iFuncLine) abort "{{{
 endfunction "}}}
 
 function! s:goto_sid_func(sFuncName, iFuncLine) abort "{{{
-    let l:lsMatch = matchlist(l:sFuncName, '<SNR>\(\d\+\)_\(\S\+\)')
-    if len(l:lsMatch) < 2
-        echoerr 'Invalid s:function format: ' . l:sFuncName
+    let l:lsMatch = matchlist(a:sFuncName, '<SNR>\(\d\+\)_\(\S\+\)')
+    if len(l:lsMatch) < 2+1
+        echoerr 'Invalid s:function format: ' . a:sFuncName
     endif
-    let l:iSID = l:lsMatch[0]
-    let l:sFuncName = l:lsMatch[1]
+    let l:iSID = l:lsMatch[1]
+    let l:sFuncName = l:lsMatch[2]
 
     let l:lsVimfile = s:PACK.scripts()
     let l:pFilePath = l:lsVimfile[l:iSID-1]

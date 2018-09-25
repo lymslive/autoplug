@@ -3,7 +3,7 @@
 " Author: lymslive / 2016-08-27
 
 " public function entrance
-function! microcmd#EV#Commander(...) "{{{1
+function! microcmd#EV#Commander(...) "{{{
     " when no argument, edit vimrc
     if a:0 == 0 || len(a:1) == 0
         edit $MYVIMRC
@@ -24,6 +24,11 @@ function! microcmd#EV#Commander(...) "{{{1
     if l:arg == ',' && exists(':UltiSnipsEdit')
         UltiSnipsEdit
         return 1
+    endif
+
+    " eidt [b:]bufnr or [s:]SID, numbered argument
+    if l:arg =~? '^[sb]\?:\?\d\+'
+        return s:find_number(l:arg)
     endif
 
     " provide full path 
@@ -47,11 +52,31 @@ function! microcmd#EV#Commander(...) "{{{1
 
     echo 'cannot find vim file: ' . l:arg
     return 0
-endfunction
+endfunction "}}}
+
+" Func: s:find_number 
+function! s:find_number(arg) abort "{{{
+    let l:number = matchstr(a:arg, '\zs\d\+\ze$')
+    if empty(l:number)
+        return
+    endif
+
+    let l:type = a:arg[0]
+    if l:type ==? 'b' || l:type !=? 's' && bufexists(l:number)
+        execute 'buffer' l:number
+        return
+    else
+        let l:Scripts = package#imports('package', 'scripts')
+        let l:lsVimfile = l:Scripts()
+        let l:pFilePath = l:lsVimfile[l:number-1]
+        execute 'edit' l:pFilePath
+        return 1
+    endif
+endfunction "}}}
 
 " try to find a file in runtime path or it's plugin subdirectory
 " the argument `file` may with or without `.vim` extension
-function! s:FindinRTP(file) "{{{1
+function! s:FindinRTP(file) "{{{
     let l:rtps = split(&runtimepath, ',')
     for l:rtp in l:rtps
         let l:path = l:rtp . '/' . a:file
@@ -72,10 +97,10 @@ function! s:FindinRTP(file) "{{{1
         endif
     endfor
     return ''
-endfunction
+endfunction "}}}
 
 " custom completion
-function! microcmd#EV#Complist(ArgLead, CmdLine, CursorPos) "{{{1
+function! microcmd#EV#Complist(ArgLead, CmdLine, CursorPos) "{{{
     " from empty, complete rumtimepath
     if empty(a:ArgLead)
         return split(globpath(&runtimepath, a:ArgLead), "\n")
@@ -95,7 +120,7 @@ function! microcmd#EV#Complist(ArgLead, CmdLine, CursorPos) "{{{1
     " glob in currnet and runtime paths 
     let l:paths = getcwd() . ',' . &runtimepath
     return split(globpath(l:paths, l:ArgLead), "\n")
-endfunction
+endfunction "}}}
 " NOTE:
 " this method will insert full path before ArgLead,
 " so use -complete=customlist other than -complete=custom
