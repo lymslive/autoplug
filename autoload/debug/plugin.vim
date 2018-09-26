@@ -17,6 +17,7 @@ function! s:debug(...) abort "{{{
     endif
 endfunction "}}}
 command! -nargs=? DEBUG call s:debug(<f-args>)
+DEBUG 1
 
 SOURCE ./log.vim
 
