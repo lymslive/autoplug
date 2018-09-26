@@ -37,8 +37,16 @@ command! -nargs=* -bang -complete=file Test call debug#test#command(<bang>0, <f-
 command! -nargs=0 -count=10 MessageQ call debug#test#MessageRefix(<count>, 'qf')
 command! -nargs=0 -count=10 MessageL call debug#test#MessageRefix(<count>, 'll')
 command! -nargs=0 -count=10 MessageView call debug#message#view(<count>)
-nnoremap g> :<C-u>10MessageQ<CR>
+
+" open the log buffer window or message window
+nnoremap g> :<C-u>LOGON<CR>
 nnoremap g/ :<C-u>10MessageView<CR>
+
+" :BreakFunc funcname [lineshift]
+" add breakpoint in a function
+" {funcname} can be s:funcname form, 
+" then will search the output of ":function /" to get the real funcname
+command! -nargs=+ BreakFunc call debug#break#func(<f-args>)
 
 " ftvim: 
 function! debug#plugin#ftvim() abort "{{{

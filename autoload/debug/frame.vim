@@ -30,18 +30,23 @@ function! s:stack_list(sTrace) abort "{{{
     return l:stacks
 endfunction "}}}
 
+" Func: s:func_line 
+" split trace format "funcname[line]"
+" return 2-item list [funcname line]
+function! s:func_line(sTrace) abort "{{{
+    if a:sTrace =~? '\[\d\+\]'
+        let l:split = split(a:sTrace, '\[')
+        return [l:split[0], 0+l:split[1]]
+    else
+        return [a:sTrace, 1]
+    endif
+endfunction "}}}
+
 " stack_locat:
 " try locate to stack intem string {function-name1}[{lnum}]
 " the source script will load in the previous window if any.
 function! s:stack_locate(sTrace) abort "{{{
-    let l:lsMatch = matchlist(a:sTrace, '\(\S\+\)\(\[\d\+\]\)\?')
-    if len(l:lsMatch) < 2+1
-        echoerr 'Invalid trace format: ' . a:sTrace
-    endif
-
-    let l:sFuncName = l:lsMatch[1]
-    let l:iFuncLine = l:lsMatch[2]
-
+    let [l:sFuncName, l:iFuncLine] = s:func_line(a:sTrace)
     if l:sFuncName =~# '#'
         return s:goto_sharp_func(l:sFuncName, l:iFuncLine)
     elseif l:sFuncName =~# 'SNR'

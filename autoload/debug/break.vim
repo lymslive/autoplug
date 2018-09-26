@@ -120,6 +120,40 @@ function! s:BreakFile(file, ...) abort "{{{
     : execute l:cmd
 endfunction "}}}
 
+" Func: #func 
+function! debug#break#func(func, ...) abort "{{{
+    if a:func =~# '^s:'
+        let l:sFuncName = matchstr(a:func, '^s:\zs\w\+\ze')
+        let l:Message = package#imports('debug#message', 'list')
+
+        let l:lsOut = l:Message('function /' . l:sFuncName)
+        if len(l:lsOut) > 1
+            for l:idx in range(len(l:lsOut))
+                echo l:idx l:lsOut[l:idx]
+            endfor
+            let l:idx = 0 + input('select index[0]', '0')
+            if l:idx > len(l:lsOut)
+                let l:idx = -1
+            endif
+        else
+            let l:idx = 0
+        endif
+
+        let l:sLine = l:lsOut[l:idx]
+        let l:sFuncName = matchstr(l:sLine, 'function \zs[^()]\+\ze')
+        :DLOG 'will break on function: ' . l:sFuncName
+    else
+        let l:sFuncName = a:func
+    endif
+
+    if !empty(l:sFuncName)
+        let l:iLine = get(a:000, 0, 1)
+        call s:BreakFunc(l:sFuncName, l:iLine)
+    else
+        :ELOG 'empty function name?'
+    endif
+endfunction "}}}
+
 function! debug#break#load(...) abort "{{{
     return 1
 endfunction "}}}

@@ -16,9 +16,11 @@ let s:MESBUFFER_HEIGHT = 15
 
 " Func: s:list 
 " get all message, return as string list
-function! s:list() abort "{{{
+function! s:list(...) abort "{{{
+    let l:cmd = get(a:000, 0, 'messages')
+
     : redir => s:output
-    : silent messages
+    : execute 'silent' l:cmd
     : redir END
 
     let s:lsMessage = split(s:output, '\n')
@@ -124,10 +126,13 @@ endfunction "}}}
 
 " Func: s:mesmap 
 function! s:mesmap() abort "{{{
+    setlocal iskeyword=a-z,A-Z,48-57,_,[,],>,<
     nnoremap <buffer> q :q<CR>
     nnoremap <buffer> j :call <SID>meskey_j()<CR>
     nnoremap <buffer> k :call <SID>meskey_k()<CR>
     nnoremap <buffer> <CR> :call <SID>meskey_CR()<CR>
+    nnoremap <buffer> b :call <SID>meskey_b('<C-R><C-W>')<CR>b
+    vnoremap <buffer> b y:call <SID>meskey_b('<C-R>"')<CR>
 endfunction "}}}
 
 " Func: s:meskey_k 
@@ -192,19 +197,33 @@ function! s:meskey_j() abort "{{{
     return 1
 endfunction "}}}
 
+" Func: s:meskey_b 
+function! s:meskey_b(word) abort "{{{
+    let [l:sFuncName, l:iFuncLine] = s:func_line(a:word)
+    call debug#break#func(l:sFuncName, l:iFuncLine)
+    return 1
+endfunction "}}}
+
 " Func: s:meskey_CR 
 function! s:meskey_CR() abort "{{{
     let l:sLine = getline('.')
     if l:sLine =~# 'function\s\+\S\+\.\.'
+        " split <sfile> long call stack into separate line
         let l:sTrace = matchstr(l:sLine, '\zsfunction\s\+\S\+\ze')
         let l:lsTrace = s:stack_list(l:sTrace)
         if len(l:lsTrace) <= 0
             return
         endif
         call map(l:lsTrace, '"[trace] .. " . v:val')
+        " add tail message another line
+        let l:msg = matchstr(l:sLine, '(function\s\+\S\+)\s\+\zs.*')
+        if !empty(l:msg)
+            call add(l:lsTrace, '[trace] -- ' .l:msg)
+        endif
         call append('.', l:lsTrace)
         normal! j
     elseif l:sLine =~ '^\[trace\] .. '
+        " try jump to the source script of this stack
         let l:sTrace = matchstr(l:sLine, '^\[trace\] .. \zs\S\+\ze')
         call s:stack_locate(l:sTrace)
     endif

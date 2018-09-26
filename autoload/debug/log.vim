@@ -11,6 +11,7 @@ let s:mesmap = package#imports('debug#message', 'mesmap')
 
 let s:LEVEL_NAME = ['ERR', 'DBG', 'WARN', 'INFO']
 let s:LOGBUFFER_NAME = '.VIMLOG.buf'
+let s:LOGBUFFER_HEIGHT = 15
 
 " :LOGON      |" start to log to a vim buffer
 " :LOGON file |" start go log to file
@@ -18,9 +19,10 @@ let s:LOGBUFFER_NAME = '.VIMLOG.buf'
 function! debug#log#on(...) abort "{{{
     if a:0 == 0
         let l:bufnr = s:logbuffer()
-        return s:loger.log_file('%' . l:bufnr)
+        call s:loger.log_file('%' . l:bufnr)
+        call s:go_logwin()
     else
-        return s:loger.log_file(a:1)
+        call s:loger.log_file(a:1)
     endif
 endfunction "}}}
 command! -nargs=? -complete=file LOGON call debug#log#on(<f-args>)
@@ -65,4 +67,25 @@ function! s:logbuffer() abort "{{{
     let s:LOGBUFFER = l:buffer.auxbuffer(s:LOGBUFFER_NAME, {'filetype': 'log'}, s:mesmap)
 
     return s:LOGBUFFER
+endfunction "}}}
+
+" Func: s:go_logwin 
+function! s:go_logwin() abort "{{{
+    let l:wincur = winnr()
+
+    let l:winnr = bufwinnr(s:logbuffer())
+    if l:winnr == -1
+        botright split
+        execute 'buffer' s:logbuffer()
+        if winheight(0) > s:LOGBUFFER_HEIGHT
+            execute 'resize' s:LOGBUFFER_HEIGHT
+        endif
+        let l:winnr = bufwinnr(s:logbuffer())
+    endif
+
+    if l:winnr != -1 && l:winnr != l:wincur
+        execute l:winnr . 'wincmd w'
+    endif
+
+    return l:winnr
 endfunction "}}}
