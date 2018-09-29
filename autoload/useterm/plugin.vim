@@ -5,6 +5,7 @@
 " Modify: 2018-07-16
 
 if has('terminal')
+    tnoremap <Esc><Esc> <C-\><C-N>
     tnoremap <C-W>b <C-\><C-N><C-B>
     tnoremap <C-W>n <C-W>:tabnext<CR>
     tnoremap <C-W>N <C-W>:tabNext<CR>

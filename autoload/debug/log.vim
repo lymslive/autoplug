@@ -63,7 +63,7 @@ function! s:logbuffer() abort "{{{
         return s:LOGBUFFER
     endif
 
-    let l:buffer = package#import('ly#buffer')
+    let l:buffer = package#import('cn#buffer')
     let s:LOGBUFFER = l:buffer.auxbuffer(s:LOGBUFFER_NAME, {'filetype': 'log'}, s:mesmap)
 
     return s:LOGBUFFER

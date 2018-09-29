@@ -57,7 +57,7 @@ function! s:mesbuf() abort "{{{
         return s:MESBUFFER
     endif
 
-    let l:buffer = package#import('ly#buffer')
+    let l:buffer = package#import('cn#buffer')
     let s:MESBUFFER = l:buffer.auxbuffer(s:MESBUFFER_NAME, {'filetype': 'log'}, function('s:mesmap'))
 
     return s:MESBUFFER
