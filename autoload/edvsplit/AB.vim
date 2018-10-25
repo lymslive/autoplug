@@ -5,7 +5,7 @@
 
 " Ignore some extensions
 " add *.d output of cpp(The C Preprocessor)
-let s:wildignore_default = "*.o,*.obj,*.out,*.exe,*.d"
+let s:wildignore_default = "*.o,*.obj,*.out,*.exe,*.d,*.gcda,*.gcno"
 
 " Find a alternative file in one path.
 " IN: a:file, filename without path
@@ -130,6 +130,15 @@ function! edvsplit#AB#FindAltFile(file, ...) " {{{1
 		let extspec = a:1
 	else
 		let extspec = ""
+        " special filetype handle
+        if &filetype ==? 'c' || &filetype ==? 'cpp'
+            let l:ext = fnamemodify(a:file, ':e')
+            if l:ext =~? '^c'
+                let extspec = '.h'
+            elseif l:ext =~? '^h'
+                let extspec = '.c'
+            endif
+        endif
 	endif
 	" echomsg printf("calling edvsplit#AB#FindAltFile(%s, %s)", a:file, extspec)
 
@@ -157,15 +166,6 @@ function! edvsplit#AB#EditAltFile(file, ...) " {{{1
 		let extspec = a:1
 	else
         let extspec = ""
-        " special filetype handle
-        if &filetype ==? 'c' || &filetype ==? 'cpp'
-            let l:ext = fnamemodify(a:file, ':e')
-            if l:ext =~? '^c'
-                let extspec = '.h'
-            elseif l:ext =~? '^h'
-                let extspec = '.c'
-            endif
-        endif
 	endif
 	let altfile = edvsplit#AB#FindAltFile(a:file, extspec)
 	if strlen(altfile) > 0
