@@ -33,6 +33,10 @@ function! tailflow#cmdu#hStart(...) abort "{{{
 
     " create object
     let l:file = l:lsPost[0]
+    if !filereadable(l:file)
+        echoerr 'file not exists:' l:file
+        return -1
+    endif
     let l:jFlow = tailflow#CFlow#new(l:file)
 
     " additional options
@@ -55,4 +59,11 @@ function! tailflow#cmdu#hStart(...) abort "{{{
         let b:jFlow = l:jFlow
         call tailflow#onft#Flow()
     endif
+endfunction "}}}
+
+" Func: #complist 
+function! tailflow#cmdu#complist(ArgLead, CmdLine, CursorPos) abort "{{{
+    let l:lsFile = glob(a:ArgLead . '*', 0, 1)
+    call reverse(sort(l:lsFile))
+    return l:lsFile
 endfunction "}}}

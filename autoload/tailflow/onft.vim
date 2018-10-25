@@ -16,7 +16,7 @@ function! tailflow#onft#Flow() abort "{{{
     command! -buffer -nargs=0 Stop call tailflow#onft#hStop()
     command! -buffer -nargs=0 Run  call tailflow#onft#hRun()
     command! -buffer -nargs=* Cmd  call tailflow#onft#hCmd(<f-args>)
-    command! -buffer -nargs=* File call tailflow#onft#hFile(<f-args>)
+    command! -buffer -nargs=* -complete=customlist,tailflow#cmdu#complist File call tailflow#onft#hFile(<f-args>)
     command! -buffer -nargs=0 Status call tailflow#onft#hStatus(<f-args>)
 
     " match or not match the word under cursor

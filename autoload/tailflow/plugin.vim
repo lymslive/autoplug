@@ -4,7 +4,7 @@
 " Create: 2018-06-04
 " Modify: 2018-06-04
 
-command! -nargs=+ -complete=file Tail call tailflow#cmdu#hStart(<f-args>)
+command! -nargs=+ -complete=customlist,tailflow#cmdu#complist Tail call tailflow#cmdu#hStart(<f-args>)
 
 " SepLine: append a separate line to view log clearer
 function! s:SepLine(...) abort "{{{
@@ -14,7 +14,7 @@ function! s:SepLine(...) abort "{{{
     call append(line('$'), ['', l:line, ''])
     normal! G
 endfunction "}}}
-command! -nargs=* -complete=file SepLine call s:SepLine(<f-args>)
+command! -nargs=* SepLine call s:SepLine(<f-args>)
 
 " load: 
 function! tailflow#plugin#load() abort "{{{
