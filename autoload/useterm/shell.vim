@@ -83,6 +83,8 @@ function! useterm#shell#SendShellCmd(bang, cmd) abort "{{{
     endif
     if !empty(a:cmd)
         call term_sendkeys('', a:cmd . "\<CR>")
+        " into insert mode in terminal window
+        normal! i
     endif
 
     " back to origin window

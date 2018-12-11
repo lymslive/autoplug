@@ -5,7 +5,8 @@
 " Modify: 2018-07-16
 
 if has('terminal')
-    tnoremap <Esc><Esc> <C-\><C-N>
+    " tnoremap <Esc><Esc> <C-\><C-N>
+    tnoremap <Esc> <C-\><C-N>
     tnoremap <C-W>b <C-\><C-N><C-B>
     tnoremap <C-W>n <C-W>:tabnext<CR>
     tnoremap <C-W>N <C-W>:tabNext<CR>
@@ -28,7 +29,7 @@ endif
 command! -nargs=* -bang Shell call useterm#shell#SendShellCmd(<bang>0, <q-args>)
 " Tcd:
 " make the terminal cd to current file directory from which this cmd executed
-command! -nargs=* Tcd call useterm#shell#SendShellCmd(0, 'cd ' . expand('%:p'))
+command! -nargs=* Tcd call useterm#shell#SendShellCmd(0, 'cd ' . expand('%:p:h'))
 
 " MysqlTable:
 " show basic information (desc and count(*)) of a table
