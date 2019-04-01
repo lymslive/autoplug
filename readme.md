@@ -84,6 +84,14 @@ $ git clone https://github.com/lymslive/autoplug.git
 `~/.vim/autolaod/` 目录下，应该就能工作了。也可以用其他流行的 vim 插件管理工具
 自动安装。
 
+### 自定义配置
+
+在不执行 `:PI` 命令加载子插件时，几乎不会影响当前 vim 的任何设置。可按需激活想
+用的功能。
+
+可将某个子插件目录的 `autoload/*/plugin.vim` 文件复制到 `~/.vim/autoload` 对应位
+置，再直接对全局变量、映射、命名名修改，可覆盖我这里提供的默认使用方式。
+
 ## 缘满
 
 ### 保持独立的插件仓库
@@ -105,6 +113,7 @@ $ git clone https://github.com/lymslive/autoplug.git
 + [qcmotion](autoload/qcmotion) 基于上下文件的单键快速移动
 + [spacebar](autoload/spacebar) 空格键的一些映射
 + [tailflow](autoload/tailflow) 在 vim 中查看日志流
++ [zfold](autoload/zfold) 手动折叠扩展功能
 + [debug](autoload/debug) 辅助开发调试 viml 的一组模块
 + [template](autoload/template) 辅助生成 viml 类文件的模块工具
 + [golang](autoload/golang) 个人定制的一些为开发 go 的配置

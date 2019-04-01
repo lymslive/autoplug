@@ -5,6 +5,7 @@
 " Modify: 2018-06-04
 
 command! -nargs=+ -complete=customlist,tailflow#cmdu#complist Tail call tailflow#cmdu#hStart(<f-args>)
+command! -nargs=+ -complete=customlist,tailflow#cmdu#complist Tall call tailflow#cmdu#hStart(<f-args>, '--cmd', 'cat')
 
 " SepLine: append a separate line to view log clearer
 function! s:SepLine(...) abort "{{{
