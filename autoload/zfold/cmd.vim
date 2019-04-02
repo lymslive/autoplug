@@ -1,3 +1,9 @@
+" File: cmd
+" Author: lymslive
+" Description: implement of zfold command
+" Create: 2019-04-03
+" Modify: 2019-04-03
+
 " Func: #nFold 
 " For Normal Map: toggle fold open/close or try to zf%, or zj
 function! zfold#cmd#nFold() abort "{{{
@@ -296,6 +302,9 @@ endfunction "}}}
 function! s:foldLines(iFirst, iLast) abort "{{{
     if a:iFirst >= a:iLast
         return 0
+    endif
+    if foldlevel(a:iFirst) > 0
+        execute a:iFirst . ',' . a:iLast . ' foldopen!'
     endif
     execute a:iFirst . ',' . a:iLast . ' fold'
     return a:iLast - a:iFirst

@@ -1,0 +1,21 @@
+{
+	"ft":{
+		"vim":{
+			"0":"^function ^endfuncion",
+			"if":"^\s*if ^\s*endif ^\s*for ^\s*endfor ^\s*while ^\s*endwhile",
+			"commet":"^\s*\\\""
+		},
+		"perl":{
+			"0":"{}",
+			"pod":"/^=pod/ /^=cut/",
+			"pod2":"/^=/== $",
+			"commet":"#"
+		},
+		"markdow":{
+			"0":"/^# .\+/=> /^## .\+/=> /^### .\+/=> /^#### .\+/=> $",
+			"code":"/^```/=="
+		},
+		"xml":{
+		}
+	}
+}
