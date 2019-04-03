@@ -1,8 +1,8 @@
 {
 	"ft":{
 		"vim":{
-			"0":"^function ^endfuncion",
-			"if":"^\s*if ^\s*endif ^\s*for ^\s*endfor ^\s*while ^\s*endwhile",
+			"0":"function endfuncion",
+			"if":"if endif for endfor while endwhile",
 			"commet":"^\s*\\\""
 		},
 		"perl":{
@@ -12,8 +12,8 @@
 			"commet":"#"
 		},
 		"markdow":{
-			"0":"/^# .\+/=> /^## .\+/=> /^### .\+/=> /^#### .\+/=> $",
-			"code":"/^```/=="
+			"0":"/^#\s.\+/=> /^##\s.\+/=> /^###\s.\+/=> /^####\s.\+/=> /$/=>",
+			"code":"/^```/="
 		},
 		"xml":{
 		}

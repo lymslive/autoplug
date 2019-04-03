@@ -22,7 +22,7 @@ function! zfold#cmd#nFold() abort "{{{
             return
         endif
 
-        call s:checkFold()
+        call s:checkFold(v:false)
         if l:lineAfter > l:lineBefore
             return s:foldLines(l:lineBefore, l:lineAfter)
         elseif l:lineAfter < l:lineBefore
@@ -35,7 +35,7 @@ endfunction "}}}
 " For Visual Map: create fold selected lines like v-zf
 function! zfold#cmd#vFold() range abort "{{{
     if a:lastline > a:firstline
-        call s:checkFold()
+        call s:checkFold(v:false)
         return s:foldLines(a:firstline, a:lastline)
     endif
 endfunction "}}}
@@ -43,10 +43,7 @@ endfunction "}}}
 " Func: #Fold 
 " For Command:
 function! zfold#cmd#Fold(bang, ...) range abort "{{{
-    call s:checkFold()
-    if a:bang
-        normal! zE
-    endif
+    call s:checkFold(a:bang)
 
     let l:firstline = 1
     let l:lastline = line('$')
@@ -60,32 +57,33 @@ function! zfold#cmd#Fold(bang, ...) range abort "{{{
     endif
 
     if a:0 == 0
-        if exists('b:foldReg')
-            let l:beginReg = b:foldReg[0]
-            let l:endReg = b:foldReg[1]
-        else
-            " normal zi
-            echo 'useage: Fold beginReg endReg'
-            return
-        endif
+        return -1
     endif
 
+    return s:foldCommand(l:firstline, l:lastline, a:000)
+endfunction "}}}
+
+" Func: s:foldCommand 
+function! s:foldCommand(iFirst, iLast, lsRegArg) abort "{{{
     let l:beginReg = {}
     let l:endReg = {}
     let l:siblingReg = []
     let l:childReg = []
+    let l:len = len(a:lsRegArg)
     let l:idx = 0
-    while l:idx < a:0
-        let l:arg = a:000[l:idx]
+    while l:idx < l:len
+        let l:arg = a:lsRegArg[l:idx]
         let l:idx += 1
         if empty(l:arg)
             continue
+        elseif l:arg[0] ==# '$'
+            call s:foldSpecail(a:iFirst, a:iLast, l:arg)
         elseif l:arg ==# '{}'
-            call s:foldCreate(l:firstline, l:lastline, '{\s*$', '^\s*}')
+            call s:foldCreate(a:iFirst, a:iLast, '{\s*$', '^\s*}')
         elseif l:arg ==# '[]'
-            call s:foldCreate(l:firstline, l:lastline, '[\s*$', '^\s*]')
+            call s:foldCreate(a:iFirst, a:iLast, '[\s*$', '^\s*]')
         elseif l:arg ==# '()'
-            call s:foldCreate(l:firstline, l:lastline, '(\s*$', '^\s*)')
+            call s:foldCreate(a:iFirst, a:iLast, '(\s*$', '^\s*)')
         else
             let l:reg = s:parseReg(l:arg)
             if empty(l:reg.flags)
@@ -96,11 +94,11 @@ function! zfold#cmd#Fold(bang, ...) range abort "{{{
                 endif
             else
                 if l:reg.flags ==# '~'
-                    call s:foldSingle(l:firstline, l:lastline, l:reg.pattern)
+                    call s:foldMatch(a:iFirst, a:iLast, l:reg.pattern)
                 elseif l:reg.flags ==# '!'
-                    call s:foldSingleInvert(l:firstline, l:lastline, l:reg.pattern)
+                    call s:foldMatch(a:iFirst, a:iLast, l:reg.pattern, 'invert')
                 elseif l:reg.flags ==# '='
-                    call s:foldCreate(l:firstline, l:lastline, l:reg, l:reg)
+                    call s:foldCreate(a:iFirst, a:iLast, l:reg, l:reg)
                 elseif l:reg.flags ==# '=='
                     call add(l:siblingReg, l:reg.pattern)
                 elseif l:reg.flags ==# '=>'
@@ -120,22 +118,22 @@ function! zfold#cmd#Fold(bang, ...) range abort "{{{
         endif
 
         if !empty(l:beginReg) && !empty(l:endReg)
-            call s:foldCreate(l:firstline, l:lastline, l:beginReg, l:endReg)
+            call s:foldCreate(a:iFirst, a:iLast, l:beginReg, l:endReg)
             let l:beginReg = {}
             let l:endReg = {}
         endif
     endwhile
 
     if !empty(l:beginReg) && empty(l:endReg)
-        call s:foldSingle(l:firstline, l:lastline, l:beginReg.pattern)
+        call s:foldMatch(a:iFirst, a:iLast, l:beginReg.pattern)
     endif
 
     if !empty(l:siblingReg)
-        call s:foldSibling(l:firstline, l:lastline, l:siblingReg)
+        call s:foldSibling(a:iFirst, a:iLast, l:siblingReg)
     endif
 
     if !empty(l:childReg)
-        call s:foldChild(l:firstline, l:lastline, l:childReg)
+        call s:foldChild(a:iFirst, a:iLast, l:childReg)
     endif
 
 endfunction "}}}
@@ -157,35 +155,56 @@ function! s:foldCreate(iFirst, iLast, sBegin, sEnd) abort "{{{
         echoerr 'fold expect one or tow non-empty regexp'
         return
     elseif !empty(l:sBegin) && empty(l:sEnd)
-        return s:foldSingle(a:iFirst, a:iLast, sBegin)
+        return s:foldMatch(a:iFirst, a:iLast, sBegin)
     elseif empty(l:sBegin) && !empty(l:sEnd)
-        return s:foldSingleInvert(a:iFirst, a:iLast, sEnd)
+        return s:foldMatch(a:iFirst, a:iLast, sEnd, 'invert')
     endif
+
+    let l:sameReg = l:sBegin ==# l:sEnd
 
     let l:foldStack = []
     for l:line in range(a:iFirst, a:iLast)
         let l:text = getline(l:line)
-        let l:isBegin = l:text =~# l:sBegin
-        let l:isEnd = l:text =~# l:sEnd
-        if l:isEnd && !l:isBegin
-            if len(l:foldStack) > 0
-                let l:foldstart = remove(l:foldStack, -1)
-                let l:foldend = l:line
-                call s:foldLines(l:foldstart + a:sBegin.shift, l:foldend + a:sEnd.shift)
+        if !l:sameReg
+            let l:isBegin = l:text =~# l:sBegin
+            let l:isEnd = l:text =~# l:sEnd
+            if l:isEnd && !l:isBegin
+                if len(l:foldStack) > 0
+                    let l:foldstart = remove(l:foldStack, -1)
+                    let l:foldend = l:line
+                    call s:foldLines(l:foldstart + a:sBegin.shift, l:foldend + a:sEnd.shift)
+                endif
+            elseif l:isBegin && !l:isEnd
+                call add(l:foldStack, l:line)
             endif
-        elseif l:isBegin && !l:isEnd
-            call add(l:foldStack, l:line)
+        else
+            let l:isMatch = l:text =~# l:sBegin
+            if l:isMatch
+                if len(l:foldStack) > 0
+                    let l:foldstart = remove(l:foldStack, -1)
+                    let l:foldend = l:line
+                    call s:foldLines(l:foldstart + a:sBegin.shift, l:foldend + a:sEnd.shift)
+                else
+                    call add(l:foldStack, l:line)
+                endif
+            endif
         endif
     endfor
 endfunction "}}}
 
-" Func: s:foldSingle 
-" fold continous lines that match /sReg/, a:sReg is regexp string
-function! s:foldSingle(iFirst, iLast, sReg) abort "{{{
+" Func: s:foldMatch 
+" fold continous lines that match or NOT match regexp string /sReg/
+function! s:foldMatch(iFirst, iLast, sReg, ...) abort "{{{
+    let l:invert = v:false
+    if a:0 > 0 && !empty(a:1)
+        let l:invert = v:true
+    endif
+
     let l:foldStart = 0
     for l:line in range(a:iFirst, a:iLast)
         let l:text = getline(l:line)
-        if l:text =~# a:sReg
+        let l:match = (!l:invert) ? (l:text =~# a:sReg) : (l:text !~# a:sReg)
+        if l:match
             if l:foldStart == 0
                 let l:foldStart = l:line
             endif
@@ -198,23 +217,40 @@ function! s:foldSingle(iFirst, iLast, sReg) abort "{{{
     endfor
 endfunction "}}}
 
-" Func: s:foldSingleInvert 
-" fold continous lines that NOT match /sReg/
-function! s:foldSingleInvert(iFirst, iLast, sReg) abort "{{{
-    let l:foldStart = 0
-    for l:line in range(a:iFirst, a:iLast)
-        let l:text = getline(l:line)
-        if l:text !~# a:sReg
-            if l:foldStart == 0
-                let l:foldStart = l:line
+" Func: s:foldSpecail 
+" a:sName is like '$name', to do some specific thing.
+function! s:foldSpecail(iFirst, iLast, sName) abort "{{{
+    let l:sName = strpart(a:sName, 1)
+    if l:sName =~# '^\d\+$'
+        let l:level = 0 + l:sName
+        execut 'setlocal foldlevel=' . l:evel
+        return
+    endif
+
+    try
+        let l:config = g:zfold#set#json
+        if empty(l:sName)
+            " $ only, try currnet filetype
+            let l:ft = &filetype
+            if has_key(l:config, 'ft') && has_key(l:config.ft, l:ft) && has_key(l:config.ft[l:ft], '0')
+                let l:regexp = l:config.ft[l:ft]['0']
+                call s:foldCommand(a:iFirst, a:Last, split(l:regexp, '\s\+'))
             endif
+        elseif has_key(l:config, l:sName)
+            " $golbal_name
+            let l:regexp = l:config[l:sName]
+            call s:foldCommand(a:iFirst, a:Last, split(l:regexp, '\s\+'))
         else
-            if l:foldStart > 0
-                call s:foldLines(l:foldStart, l:line-1)
-                let l:foldStart = 0
+            " $filetype_local_name
+            let l:ft = &filetype
+            if has_key(l:config, 'ft') && has_key(l:config.ft, l:ft) && has_key(l:config.ft[l:ft], l:sName)
+                let l:regexp = l:config.ft[l:ft][l:sName]
+                call s:foldCommand(a:iFirst, a:Last, split(l:regexp, '\s\+'))
             endif
         endif
-    endfor
+    catch 
+        echomsg 'no config named: ' . a:sName
+    endtry
 endfunction "}}}
 
 " Func: s:foldSibling 
@@ -265,14 +301,15 @@ function! s:foldChild(iFirst, iLast, liReg) abort "{{{
         call remove(a:liReg, -1)
     endif
 
-    let l:foldStart = []
     let l:lenReg = len(a:liReg)
+    let l:foldStart = repeat([0], l:lenReg)
+
     for l:line in range(a:iFirst, a:iLast)
         let l:text = getline(l:line)
         for l:idx in range(l:lenReg)
             let l:reg = a:liReg[l:idx]
             if l:text =~# l:reg
-                let l:foldidx = len(l:foldStart) - 1
+                let l:foldidx = l:lenReg - 1
                 while l:foldidx >= l:idx
                     if l:foldStart[l:foldidx] > 0
                         call s:foldLines(l:foldStart[l:foldidx], l:line-1)
@@ -286,9 +323,9 @@ function! s:foldChild(iFirst, iLast, liReg) abort "{{{
         endfor
     endfor
 
-    if l:final && len(l:foldStart) > 0
-        let l:foldidx = len(l:foldStart) - 1
-        while l:foldidx >= l:idx
+    if l:final
+        let l:foldidx = l:lenReg - 1
+        while l:foldidx >= 0
             if l:foldStart[l:foldidx] > 0 && l:foldStart[l:foldidx] < a:iLast
                 call s:foldLines(l:foldStart[l:foldidx], a:iLast)
                 let l:foldStart[l:foldidx] = 0
@@ -303,7 +340,7 @@ function! s:foldLines(iFirst, iLast) abort "{{{
     if a:iFirst >= a:iLast
         return 0
     endif
-    if foldlevel(a:iFirst) > 0
+    if foldlevel(a:iFirst) > 0 || foldlevel(a:iLast) > 0
         execute a:iFirst . ',' . a:iLast . ' foldopen!'
     endif
     execute a:iFirst . ',' . a:iLast . ' fold'
@@ -311,9 +348,11 @@ function! s:foldLines(iFirst, iLast) abort "{{{
 endfunction "}}}
 
 " Func: s:checkFold 
-function! s:checkFold() abort "{{{
+function! s:checkFold(bang) abort "{{{
     if &foldmethod !=? 'manual'
         set foldmethod=manual
+    endif
+    if a:bang
         normal! zE
     endif
 endfunction "}}}
@@ -344,6 +383,7 @@ endfunction "}}}
 
 " Func: s:parseReg 
 " parse '/regexp/flags', return a dict with key pattern and flags
+" when no // quoted and not begin with ^ and not end with $, auto prefix ^\s*
 function! s:parseReg(arg) abort "{{{
     let l:ret = {'pattern':a:arg, 'flags':'', 'shift':0}
     if len(a:arg) < 2
@@ -351,6 +391,9 @@ function! s:parseReg(arg) abort "{{{
     endif
 
     if a:arg[0] != '/'
+        if a:arg[0] != '^' && a:arg[len(a:arg)-1] != '$'
+            let l:ret.pattern = '^\s*' . a:arg
+        endif
         return l:ret
     endif
 
