@@ -50,3 +50,17 @@ endfunction "}}}
 
 command! -nargs=* -complete=customlist,autoplug#complete PI call autoplug#load(<f-args>)
 command! -nargs=1 SOURCE execute 'source ' . expand('<sfile>:p:h') . '/' . <q-args>
+
+" Func: #jsonConfig 
+" find the first json config file in &rtp with name {a:pName} or default {a:pLocal}
+" return decoded vimL dict or empty {}
+function! autoplug#jsonConfig(pName, pLocal) abort
+    let l:lsFile = globpath(&rtp, a:pName, '', 1)
+    let l:pFile = !empty(l:lsFile) ? l:lsFile[0] : a:pLocal
+    try
+        let l:json = json_decode(join(readfile(l:pFile), ''))
+    catch 
+        let l:json = {}
+    endtry
+    return l:json
+endfunction

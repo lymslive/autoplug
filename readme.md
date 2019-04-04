@@ -1,4 +1,4 @@
-# Vim 本地插件集合与动态加载管理
+# Vim 动态加载插件管理与集合
 
 ## 缘起
 
@@ -86,13 +86,37 @@ $ git clone https://github.com/lymslive/autoplug.git
 
 ### 自定义配置
 
-在不执行 `:PI` 命令加载子插件时，几乎不会影响当前 vim 的任何设置。可按需激活想
-用的功能。
+在不执行 `:PI` 命令加载子插件时，几乎不会影响当前 vim 的任何环境设置。可按需激活想
+用的功能，也可酌情在 `vimrc` 等初始化脚本中用 `:PI` 命令添加最常用的子插件。
 
 可将某个子插件目录的 `autoload/*/plugin.vim` 文件复制到 `~/.vim/autoload` 对应位
-置，再直接对全局变量、映射、命名名修改，可覆盖我这里提供的默认使用方式。
+置，再直接对全局变量、映射、命名名修改，可覆盖我这里提供的默认使用方式。部分子
+插件可能支持更详尽的定制，请参阅相应的文档。
+
+也可按这里的思路，自行在 `~/.vim/autoload` 下建子目录，组织添加自己想要的功能
+，哪怕只是简单归纳配置其他大型经典插件的个人选项。
 
 ## 缘满
+
+### 本仓库包含的实用插件列表
+
+`autoload` 每个子目录相当于一个子插件，大部分子插件目录，也有自己的说明文档。
+以下子插件大致按个人实用度排序：
+
++ [edvsplit](autoload/edvsplit) 双窗口编辑模式
++ [usetabpg](autoload/usetabpg) 使用多标签页工作
++ [microcmd](autoload/microcmd) 简易实用的微命令集
++ [wraptext](autoload/wraptext) 修饰包含括号等小功能
++ [tailflow](autoload/tailflow) 在 vim 中查看日志流
++ [zfold](autoload/zfold) 手动折叠扩展功能
++ [useterm](autoload/useterm) 使用 vim8 内置终端的一些配置
++ [qcmotion](autoload/qcmotion) 基于上下文件的单键快速移动
++ [debug](autoload/debug) 辅助开发调试 viml 的一组模块
++ [template](autoload/template) 辅助生成 viml 类文件的模块工具
++ [golang](autoload/golang) 个人定制的一些为开发 go 的配置
++ [spacebar](autoload/spacebar) 空格键的一些映射
++ [csviewer](autoload/csviewer) cvs 数据文件查看与编辑插件
++ [gamemaze](autoload/gamemaze) 在vim下玩玩迷宫游戏(demo)
 
 ### 保持独立的插件仓库
 
@@ -102,28 +126,9 @@ $ git clone https://github.com/lymslive/autoplug.git
 * [vnote](https://github.com/lymslive/vnote) 用 vim 写日记记笔记
 * [StartVim](https://github.com/lymslive/StartVim) 用不同的姿式启动 vim
 
-### 本仓库包含的实用插件列表
-
-`autoload` 每个子目录相当于一个子插件，大部分子插件目录，也有自己的说明文档。
-
-+ [edvsplit](autoload/edvsplit) 双窗口编辑模式
-+ [usetabpg](autoload/usetabpg) 使用多标签页工作
-+ [microcmd](autoload/microcmd) 简易实用的微命令集
-+ [wraptext](autoload/wraptext) 修饰包含括号等小功能
-+ [qcmotion](autoload/qcmotion) 基于上下文件的单键快速移动
-+ [spacebar](autoload/spacebar) 空格键的一些映射
-+ [tailflow](autoload/tailflow) 在 vim 中查看日志流
-+ [zfold](autoload/zfold) 手动折叠扩展功能
-+ [debug](autoload/debug) 辅助开发调试 viml 的一组模块
-+ [template](autoload/template) 辅助生成 viml 类文件的模块工具
-+ [golang](autoload/golang) 个人定制的一些为开发 go 的配置
-+ [useterm](autoload/useterm) 使用 vim8 内置终端的一些配置
-+ [gamemaze](autoload/gamemaze) 在vim下玩玩迷宫游戏(demo)
-
 <!--
 ### 计划或正在撸的插件
 
-- [csviewer](autoload/csviewer) cvs 数据文件查看与编辑插件
 - [vtmder](autoload/vtmder) 受 TC 与 MC 启发的文件管理插件
 -->
 

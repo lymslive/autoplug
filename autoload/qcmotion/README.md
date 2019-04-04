@@ -4,7 +4,7 @@
 ## Summary
 
 Try to do smart motion depended on the differnet C entity under current
-cursor. The default banding map is 'q', which is left near 'w' character. It
+cursor. The default banding map is 'Q', which is left near 'w' character. It
 may override the macro key, but you can custom this maping directly edit the
 'plugin/qcmotion.vim' or a copy of it and rename to 'setlocal.vim'. 
 (The source comment and doc, if provided, is written in english, and the left
@@ -12,7 +12,7 @@ of this page is written in chinese.)
 
 ## 使用方式
 在 `autoplug` 已加载的情况下执行 `:PI qcmotion` 命令，然后在移动或需要操作块时
-按 `q` 键，或许有奇效。
+按 `q` 键，或许有奇效。（现在已将默认快捷键改为大写 `Q`）
 
 ## 背景介绍
 

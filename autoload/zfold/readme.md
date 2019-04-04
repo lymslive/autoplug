@@ -25,6 +25,8 @@ command! -range -nargs=* -bang Z <line1>,<line2>call zfold#cmd#Fold(<bang>0, <f-
 :Z 命令可接收一系列参数，对当前文件或指定范围进行扫描，按要求进行折叠。同时将
 折叠方式置为手动档。部分参数也可修改其他折叠相关设置。
 
+### 定制与个人配置
+
 如果不喜这些默认映射或命令名，可将 `plugin.vim` 复制到 `~/.vim` 个人目录相应位
 置处修改，例如修改为 `F` 键与 `:Fold` 命令：
 
@@ -33,6 +35,14 @@ command! -range -nargs=* -bang Z <line1>,<line2>call zfold#cmd#Fold(<bang>0, <f-
 nnoremap F :call zfold#cmd#nFold()<CR>
 vnoremap F :call zfold#cmd#vFold()<CR>
 command! {命令参数不改} Fold {命令定义不改}
+```
+
+配置文件采用 json 格式，如有必要增减修改，也可以将 `set.json` 一并复制到个人目
+录：
+
+```bash
+$ cp plugin.vim ~/.vim/autoload/zfold/plugin.vim
+$ cp set.json ~/.vim/autoload/zfold/set.json
 ```
 
 ## 折叠命令参数
@@ -190,6 +200,8 @@ json.ft.python.0 == '$indent'
 
 可以表示 xml/html 文件默认使用 `$xml` 参数折叠，pyhton 文件默认使用 `$indent`
 折叠。
+
+注意：json 双引号字符串对反斜杠 `\` 的转义，如正则 `\s\+` 要写成 "\\s\\+" 。
 
 ## 混合参数使用
 
