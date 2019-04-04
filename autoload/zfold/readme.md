@@ -1,12 +1,20 @@
-# 手动折叠扩展
+# 基于正则的手动/自动折叠统一扩展
 
-基本 manual 的折叠模式，使用脚本简化手动折叠的操作，支持正则表达式。
+基于 manual 的折叠模式，使用脚本简化手动折叠的操作，支持正则表达式。
 
-默认定义映射与命令如下，键名与命令名可自行修改：
+## 激活使用
+
+安装请参考本仓库的首页文档。可用如下命令之一激活：
+```vim
+:PI zfold
+:call zfold#plugin#load()
+```
+
+默认定义空格映射与 :Z 命令如下：
 ```vim
 nnoremap <Space> :call zfold#cmd#nFold()<CR>
 vnoremap <Space> :call zfold#cmd#vFold()<CR>
-command -range -nargs=? -bang Z <line1>,<line2>call zfold#cmd#Fold(<bang>0, <f-args>)
+command! -range -nargs=* -bang Z <line1>,<line2>call zfold#cmd#Fold(<bang>0, <f-args>)
 ```
 
 空格用于切换折叠，如果没有折叠则尝试 matchit 插件，类似 zf% 折叠，如果也未能实
@@ -14,8 +22,18 @@ command -range -nargs=? -bang Z <line1>,<line2>call zfold#cmd#Fold(<bang>0, <f-a
 
 选择模式下空格，类似 zf 创建折叠。
 
-:Z 命令接收一至两个参数，按正则表达式折叠。可能在扫描中创建多个或嵌套的折叠，
-每个折叠至少两行。
+:Z 命令可接收一系列参数，对当前文件或指定范围进行扫描，按要求进行折叠。同时将
+折叠方式置为手动档。部分参数也可修改其他折叠相关设置。
+
+如果不喜这些默认映射或命令名，可将 `plugin.vim` 复制到 `~/.vim` 个人目录相应位
+置处修改，例如修改为 `F` 键与 `:Fold` 命令：
+
+```vim
+" file: ~/.vim/autoload/zfold/plugin.vim
+nnoremap F :call zfold#cmd#nFold()<CR>
+vnoremap F :call zfold#cmd#vFold()<CR>
+command! {命令参数不改} Fold {命令定义不改}
+```
 
 ## 折叠命令参数
 
@@ -104,16 +122,21 @@ command -range -nargs=? -bang Z <line1>,<line2>call zfold#cmd#Fold(<bang>0, <f-a
 
 ```
 :Z $
-:Z $1
-:Z $name
+:Z $2
+:Z $-2
+:Z $config_name
+:Z $ENVIRONMENT_VARIABLE
 ```
 
 正常的正则参数不可能以 `$` 开头，故用 `$` 表示特殊用途。可通过配置将常用折叠正
-则表达式参数（组）作易记方便的命名，然后在命令行中快捷引用。
+则表达式参数（组）作易记方便的命名，然后在命令行中快捷引用。如果恰好存在相应的
+环境变量，则展开环境变量作为命令行参数。支持从配置或环境变量中获取命令参数补全
+。
 
 单个 `$` 参数表示取与当前文件类型 `&filetype` 的配置。
 
-如果是数字，表示设置 `&foldlevel` 选项，而非扫描创建折叠。
+如果是数字，表示设置 `&foldlevel` 折叠开关层次选项，而非扫描创建折叠。如果是负数，
+则设置 `&foldcolunm` 折叠栏列宽选项。
 
 ```
 :Z $indent
@@ -123,7 +146,24 @@ command -range -nargs=? -bang Z <line1>,<line2>call zfold#cmd#Fold(<bang>0, <f-a
 :Z $xml
 ```
 
-内置命令（暂未实现）。将其他的折叠方式，转为手动创建折叠并存。
+这些是保留配置名，用于将其他的折叠方式，转为自动创建折叠，可与自动管理折叠并存。
+而 xml/html 的标签关系，恐怕难以用简单正则表示，需要单独实现。
+
+目前只实现了按缩进折叠 `$indent` 与 `$xml` 简易版标签折叠。要求开标签 `<tag>`
+与闭标签 `</tag>` 分别单独占一行的规范才能正确折叠；另外也能折叠 `<!-- 多行注释 -->`。
+
+一般情况下，不需单独使用以上 `$syntax` `$expr` 这类命令，可以直接切换折叠方法
+的选项，如：
+
+```vim
+:set foldmethod=syntax |" 或 expr indent marker
+:set foldmethod=manual |" 或无参数命令 :Z
+```
+
+因为切换至 `manual` 手动折叠时，会保留之前的折叠，这样就可以在之前的折叠设置基
+础上，再手动微调 `zf` 创建折叠或 `zd` 删除折叠等。不过 `&foldmethod` 切换影响
+的是全文档，而用这里的 `:Z $indent` 系列命令可指定范围。再如 markdonw 文件中若
+存在大段 html ，可选择范围使用 `:'<,'>Z $xml` 局部折叠。
 
 ## 命名参数配置
 
@@ -133,20 +173,34 @@ command -range -nargs=? -bang Z <line1>,<line2>call zfold#cmd#Fold(<bang>0, <f-a
 该 json 对象的第一层键作为全局名字。其中保留一个键名 `ft` ，是个嵌套对象，用于
 保存每种需要配置的文件类型，以文件类型为键提供一个局部命名空间。例如：
 `json.ft.vim.if = 'if endif'` 。并且约定文件类型的一个特殊键 `'0'` 表示该文件
-类型的默认参数，当命令行使用 `$` 时调用 `json.ft[&ft]['0']` 。
+类型的默认参数，当命令行使用单字符 `$` 时调用 `json.ft[&ft]['0']` 。
 
-配置示例文件见 [set.json](set.json) 。
+建议配置键名用小写，以区别于环境变量。环境变量可用 `:let` 命令在 `vimrc` 等初
+始化脚本中定义。并不鼓励用环境变量配置参数，如果一定要用，建议用统一直观的前缀
+如：`:let ZFOLD_IF = 'if endif'` 。
+
+配置示例文件见 [set.json](set.json) 。顶层的 `json.indent` 与 `json.xml` 等空
+值键只为给 `:Z` 提供补全提示。然后有如下关系：
+
+```vim
+json.ft.xml.0 == '$xml'
+json.ft.hmtl.0 == '$xml'
+json.ft.python.0 == '$indent'
+```
+
+可以表示 xml/html 文件默认使用 `$xml` 参数折叠，pyhton 文件默认使用 `$indent`
+折叠。
 
 ## 混合参数使用
 
 可以将以上参数类型放在一个 `:Z` 命令中，等效于分批次执行命令。例如：
 
-```
+```vim
 :Z start end /start/+ /end/- /match/~ /nomatch/! /toggle/= $2
 ```
 
 相当于依次执行：
-```
+```vim
 :Z ^\s*start ^\s*end
 :Z /start/+ /end/
 :Z /match/
@@ -169,12 +223,15 @@ command -range -nargs=? -bang Z <line1>,<line2>call zfold#cmd#Fold(<bang>0, <f-a
 完全不同类型的折叠。
 
 语法折叠 syntax 或表达式折叠 expr ，虽然更自动化，但如果遇到需要微调折叠时很不
-方便。
+方便。且对于大文件，复杂的 syntax 与 expr 折叠可能很慢。用本插件，也可以为每个
+文件类型配置相对简单的默认参数只折叠一层以提供文档大纲视图，然后根据需要执行更
+复杂的折叠。
 
 ## 已知问题与限制
 
 手动折叠没法保存，始终需要手动执行命令折叠。但是可以在 ftplugin/ 目录中对感兴
-趣的文件类型，自动配置调用一系列 :Z 命令进行折叠。
+趣的文件类型，自动配置调用一系列 :Z 命令进行折叠。或者先配置为 `syntax` 等基本
+满意的折叠方法，有必要时再 :Z 切换到手动折叠。
 
 :Z {} 折叠不能达到 C 系列语言语法折叠的效果，没法排除在注释区的 {} 。
 

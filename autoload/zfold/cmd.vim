@@ -63,6 +63,41 @@ function! zfold#cmd#Fold(bang, ...) range abort "{{{
     return s:foldCommand(l:firstline, l:lastline, a:000)
 endfunction "}}}
 
+" Func: #FoldCompl 
+" customlist completion for command Z
+function! zfold#cmd#FoldCompl(ArgLead, CmdLine, CursorPos) abort "{{{
+    let l:ArgLead = ''
+    if !empty(a:ArgLead) && a:ArgLead[0] == '$'
+        let l:ArgLead = strpart(a:ArgLead, 1)
+    else
+        return []
+    endif
+
+    if !empty(l:ArgLead) && l:ArgLead =~# '^[_A-Z]$'
+        let l:envKey = getcompletion(strpart(a:ArgLead, 1), 'environment')
+        call map(l:envKey, {key, val -> '$' . val})
+        return l:envKey
+    endif
+
+    let l:config = g:zfold#set#json
+    let l:keys = keys(l:config)
+    call filter(l:keys, 'v:val !=# "ft"')
+    let l:ft = &filetype
+    if has_key(l:config, 'ft') && has_key(l:config.ft, l:ft)
+        let l:ftKey = keys(l:config.ft[l:ft])
+        call filter(l:ftKey, 'v:val !=# "0"')
+        call extend(l:keys, l:ftKey)
+    endif
+    if !empty(l:keys)
+        call uniq(sort(l:keys))
+        if !empty(l:ArgLead)
+            call filter(l:keys, {key, val -> val =~# '^' . l:ArgLead})
+        endif
+        call map(l:keys, {key, val -> '$' . val})
+    endif
+    return l:keys
+endfunction "}}}
+
 " Func: s:foldCommand 
 function! s:foldCommand(iFirst, iLast, lsRegArg) abort "{{{
     let l:beginReg = {}
@@ -218,15 +253,33 @@ function! s:foldMatch(iFirst, iLast, sReg, ...) abort "{{{
 endfunction "}}}
 
 " Func: s:foldSpecail 
-" a:sName is like '$name', to do some specific thing.
+" a:sName is like '$name' environment or configed name, to do some specific thing.
 function! s:foldSpecail(iFirst, iLast, sName) abort "{{{
-    let l:sName = strpart(a:sName, 1)
-    if l:sName =~# '^\d\+$'
-        let l:level = 0 + l:sName
-        execut 'setlocal foldlevel=' . l:evel
-        return
+    if empty(a:sName) || a:sName[0] !=# '$'
+        return -1
     endif
 
+    " $ENVIRONMENT
+    if exists(a:sName)
+        return s:foldCommand(a:iFirst, a:iLast, split(expand(a:sName), '\s\+'))
+    endif
+
+    let l:sName = strpart(a:sName, 1)
+
+    " $1 $2 ... $-1 $-2
+    if l:sName =~# '^\d\+$'
+        let l:level = 0 + l:sName
+        execut 'setlocal foldlevel=' . l:level
+        return
+    elseif l:sName =~# '^-\d\+$'
+        let l:level = 0 - l:sName
+        execut 'setlocal foldcolumn=' . l:level
+        return
+    elseif l:sName ==# 'indent' || l:sName ==# 'xml'
+        return zfold#method#Fold(a:iFirst, a:iLast, l:sName)
+    endif
+
+    " $name from config json
     try
         let l:config = g:zfold#set#json
         if empty(l:sName)
@@ -234,18 +287,18 @@ function! s:foldSpecail(iFirst, iLast, sName) abort "{{{
             let l:ft = &filetype
             if has_key(l:config, 'ft') && has_key(l:config.ft, l:ft) && has_key(l:config.ft[l:ft], '0')
                 let l:regexp = l:config.ft[l:ft]['0']
-                call s:foldCommand(a:iFirst, a:Last, split(l:regexp, '\s\+'))
+                call s:foldCommand(a:iFirst, a:iLast, split(l:regexp, '\s\+'))
             endif
         elseif has_key(l:config, l:sName)
             " $golbal_name
             let l:regexp = l:config[l:sName]
-            call s:foldCommand(a:iFirst, a:Last, split(l:regexp, '\s\+'))
+            call s:foldCommand(a:iFirst, a:iLast, split(l:regexp, '\s\+'))
         else
             " $filetype_local_name
             let l:ft = &filetype
             if has_key(l:config, 'ft') && has_key(l:config.ft, l:ft) && has_key(l:config.ft[l:ft], l:sName)
                 let l:regexp = l:config.ft[l:ft][l:sName]
-                call s:foldCommand(a:iFirst, a:Last, split(l:regexp, '\s\+'))
+                call s:foldCommand(a:iFirst, a:iLast, split(l:regexp, '\s\+'))
             endif
         endif
     catch 
@@ -286,7 +339,6 @@ function! s:foldSibling(iFirst, iLast, liReg) abort "{{{
         call s:foldLines(l:foldStart, a:iLast)
     endif
 endfunction "}}}
-
 
 " Func: s:foldChild 
 " nested fold range based on a list regexp
@@ -337,8 +389,8 @@ endfunction "}}}
 
 " Func: s:foldLines 
 function! s:foldLines(iFirst, iLast) abort "{{{
-    if a:iFirst >= a:iLast
-        return 0
+    if a:iLast <= a:iFirst
+        return -1
     endif
     if foldlevel(a:iFirst) > 0 || foldlevel(a:iLast) > 0
         execute a:iFirst . ',' . a:iLast . ' foldopen!'
@@ -350,7 +402,8 @@ endfunction "}}}
 " Func: s:checkFold 
 function! s:checkFold(bang) abort "{{{
     if &foldmethod !=? 'manual'
-        set foldmethod=manual
+        setlocal foldmethod=manual
+        echo 'setlocal foldmethod=manual'
     endif
     if a:bang
         normal! zE
@@ -414,3 +467,12 @@ function! s:parseReg(arg) abort "{{{
     endif
     return l:ret
 endfunction "}}}
+
+" Func: #export 
+function! zfold#cmd#export() abort
+    if !exists('s:export')
+        let s:export = {}
+        let s:export.foldLines = function('s:foldLines')
+    endif
+    return s:export
+endfunction

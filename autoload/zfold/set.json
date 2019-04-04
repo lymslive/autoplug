@@ -1,7 +1,7 @@
 {
 	"ft":{
 		"vim":{
-			"0":"function endfuncion",
+			"0":"function endfunction",
 			"if":"if endif for endfor while endwhile",
 			"commet":"^\s*\\\""
 		},
@@ -16,6 +16,18 @@
 			"code":"/^```/="
 		},
 		"xml":{
-		}
-	}
+			"0":"$xml"
+		},
+		"html":{
+			"0":"$xml"
+		},
+		"python":{
+			"0":"$indent"
+		},
+		"__lang__":1
+	},
+	"indent":null,
+	"xml":null,
+	"__comment__":"null key is used for command completion, last __ key used for comma protection",
+	"__version__":1
 }
