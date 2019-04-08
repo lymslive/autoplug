@@ -114,11 +114,11 @@ function! s:foldCommand(iFirst, iLast, lsRegArg) abort "{{{
         elseif l:arg[0] ==# '$'
             call s:foldSpecail(a:iFirst, a:iLast, l:arg)
         elseif l:arg ==# '{}'
-            call s:foldCreate(a:iFirst, a:iLast, '{\s*$', '^\s*}')
+            call s:foldCommand(a:iFirst, a:iLast, ['{\s*$', '^\s*}'])
         elseif l:arg ==# '[]'
-            call s:foldCreate(a:iFirst, a:iLast, '[\s*$', '^\s*]')
+            call s:foldCommand(a:iFirst, a:iLast, ['[\s*$', '^\s*]'])
         elseif l:arg ==# '()'
-            call s:foldCreate(a:iFirst, a:iLast, '(\s*$', '^\s*)')
+            call s:foldCommand(a:iFirst, a:iLast, ['(\s*$', '^\s*)'])
         else
             let l:reg = s:parseReg(l:arg)
             if empty(l:reg.flags)
