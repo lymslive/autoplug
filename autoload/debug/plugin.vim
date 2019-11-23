@@ -19,7 +19,7 @@ endfunction "}}}
 command! -nargs=? DEBUG call s:debug(<f-args>)
 " DEBUG 1
 
-SOURCE ./log.vim
+SOURCE log.vim
 
 " rename vim file, fix path#to#function
 command! -nargs=* -complete=file VimRename call debug#rename#command(<f-args>)
