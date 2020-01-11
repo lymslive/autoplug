@@ -26,10 +26,10 @@ endif
 " send shell command to a terminal shell, open a new one if no terminal
 " may from another tabpage and/or window
 " add `!` won't jump to the terminal window
-command! -nargs=* -bang Shell call useterm#shell#SendShellCmd(<bang>0, <q-args>)
-" Tcd:
+command! -nargs=* -bang -complete=file Shell call useterm#shell#SendShellCmd(<bang>0, <q-args>)
+" ShellHere:
 " make the terminal cd to current file directory from which this cmd executed
-command! -nargs=* Tcd call useterm#shell#SendShellCmd(0, 'cd ' . expand('%:p:h'))
+command! -nargs=* ShellHere call useterm#shell#SendShellCmd(0, 'cd ' . expand('%:p:h'))
 
 " MysqlTable:
 " show basic information (desc and count(*)) of a table
@@ -42,5 +42,12 @@ command! -nargs=+ MysqlExecute echo useterm#mysql#QuickExecute(<f-args>)
 
 " load: 
 function! useterm#plugin#load() abort "{{{
+    if &buftype ==? 'terminal'
+        cnoremap <buffer> <C-CR> <Home>Shell <End><CR>
+        nnoremap <buffer> p :Shell <C-R>"
+        nnoremap <buffer> s :Shell 
+        nnoremap <buffer> <CR> :Shell <C-R><C-W>
+        vnoremap <buffer> <CR> y:Shell <C-R>=(visualmode() !=# 'v')? "" : getreg()<CR>
+    endif
     return 0
 endfunction "}}}
