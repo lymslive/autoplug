@@ -1,0 +1,2 @@
+" close current notebook
+:NoteBook!
