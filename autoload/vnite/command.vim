@@ -10,12 +10,7 @@ let s:running = v:false
 let s:output = []
 
 " Func: #precmd 
-function! vnite#command#precmd(cmd, history_number) abort
-    if a:history_number >= 0
-        call s:hotcmds.rotate(a:history_number)
-    else
-        call s:hotcmds.push(a:cmd)
-    endif
+function! vnite#command#precmd(cmd) abort
     let s:running = v:true
     let s:output = []
 endfunction
@@ -23,6 +18,15 @@ endfunction
 " Func: #postcmd 
 function! vnite#command#postcmd() abort
     let s:running = v:false
+endfunction
+
+" Func: #svaecmd 
+function! vnite#command#svaecmd(cmd, history_number) abort
+    if a:history_number >= 0
+        call s:hotcmds.rotate(a:history_number)
+    else
+        call s:hotcmds.push(a:cmd)
+    endif
 endfunction
 
 " Func: #output 
@@ -68,4 +72,18 @@ function! vnite#command#get_space(command) abort
         let l:space = {}
     endtry
     return l:space
+endfunction
+
+" Func: #post_buffer 
+function! vnite#command#post_buffer(context) abort
+    let l:command = a:context.transfer_command_name()
+    let l:func = 'vnite#command#' . l:command . '#' . 'PostBuffer'
+    if exists('*' . l:func)
+        call call(function(l:func), [a:context])
+    else
+        let l:space = vnite#command#get_space(l:command)
+        if has_key(l:space, 'PostBuffer') && type(l:space.PostBuffer) == v:t_func
+            call l:space.PostBuffer(a:context)
+        endif
+    endif
 endfunction

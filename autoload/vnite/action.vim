@@ -8,8 +8,11 @@ let g:vnite#action#space = s:
 let s:Message = vnite#Message#class()
 let s:sActBufName = '_CMDACT_'
 
+let s:error = ''
+
 " Func: #run 
-function! vnite#action#run(name) abort
+function! vnite#action#run(name, ...) abort
+    let s:error = ''
     if !exists('b:VniteContext')
         echoerr 'not in vnite message buffer'
         return -1
@@ -18,6 +21,18 @@ function! vnite#action#run(name) abort
     let l:message = s:get_message()
     let l:cmd = l:message.action(a:name)
     if empty(l:cmd)
+        if !empty(s:error)
+            let s:error = 'action not handled!'
+        endif
+        echohl WarningMsg
+        echomsg s:error
+        echohl None
+        return 0
+    endif
+
+    " only show cmd that will excuted
+    if a:0 > 0 && !empty(a:1)
+        echo l:cmd
         return 0
     endif
 
@@ -27,6 +42,13 @@ function! vnite#action#run(name) abort
     endif
     call l:context.winback()
     execute l:cmd
+    echo l:cmd
+endfunction
+
+" Func: #error 
+function! vnite#action#error(msg) abort
+    let s:error = a:msg
+    return 0
 endfunction
 
 " Func: s:get_message 

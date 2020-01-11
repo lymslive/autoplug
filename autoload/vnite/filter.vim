@@ -150,7 +150,7 @@ function! vnite#filter#apply(cmdline) abort
         endfunction
         call filter(b:VniteContext.messages, funcref('s:callback'))
         call setline(1, l:filtered)
-        execute 'match Search /' . escape(l:cmdline, '/') . '/'
+        execute 'silent! match Search /' . escape(l:cmdline, '/') . '/'
     endif
 endfunction
 

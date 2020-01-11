@@ -34,6 +34,8 @@ function! vnite#config#buffer_maps() abort
     nnoremap <buffer> <CR> :call vnite#action#run('CR')<CR>
     nnoremap <buffer> <Tab> :call vnite#action#more()<CR>
     nnoremap <buffer> ? :call vnite#action#more()<CR>
+
+    command! -buffer -bang -nargs=? Action :call vnite#action#run(<q-args>, <bang>0)
 endfunction
 
 " global filter mode maps

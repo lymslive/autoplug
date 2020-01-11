@@ -19,7 +19,8 @@ call s:cmdopt.addhead(s:description)
             \.endoption()
 
 let s:actor = vnite#Actor#new('Path')
-call s:actor.add('Default', 'CR', 'default to open, list by CM File')
+call s:actor.add('Default', 'CR', 'default to open, list by :File')
+            \.add('Files', 'F', 'recursively list by :File -r')
             \.add('Chdir', 'C', 'lcd to the directory')
             \.add('Packadd', 'A', 'add this package')
 
@@ -81,6 +82,15 @@ function! s:actor.CR(message) dict abort
         return
     endif
     return 'CM File ' . l:text
+endfunction
+
+" Method: Files 
+function! s:actor.Files(message) dict abort
+    let l:text = a:message.text
+    if l:text =~# '^#' || !isdirectory(l:text)
+        return
+    endif
+    return 'CM -- File -r ' . l:text
 endfunction
 
 " Method: CR 

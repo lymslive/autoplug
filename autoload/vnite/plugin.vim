@@ -4,7 +4,7 @@
 " Create: 2019-10-30
 " Modify: 2019-10-30
 
-" :CM real_command
+" :CM [options] [--] real_command
 " capture the output of real command in a special message buffer
 " short for `Command Message`
 command! -bang -count=0 -nargs=* -complete=command CM call vnite#main#run(<bang>0, <count>, <f-args>)

@@ -7,16 +7,13 @@
 " Context handle the information about the command that will output messages
 let s:class = {}
 let s:class._ctype_ = 'Context'
-let s:class.bufnr = 0         " the origin buffer number
-let s:class.winid = 0         " the origin window id
-let s:class.curfile = ''      " full path of current buffer
-let s:class.curpos = []       " origin cursor position
 let s:class.cmdline = ''      " full command line where message output from
 let s:class.command = ''      " the command name, usually first word
 let s:class.linebreak = "\n"  " message text seperate by \n default
 let s:class.messages = []     " list of the output messages
 let s:class.filtered = []     " list of the filtered messages current show
 let s:class.simcli = v:null   " simulated cmdline to filter message
+let s:class.sbuffer = v:null  " the associated special beffer
 let s:class.config = v:null   " config for this command or global
 
 " Func: #class 
@@ -25,18 +22,17 @@ function! vnite#Context#class() abort
 endfunction
 
 " Method: new 
-function! s:class.new(cmdline) dict abort
+function! s:class.new(cmdline, ...) dict abort
     if empty(a:cmdline)
         return {}
     endif
 
     let l:object = copy(s:class)
-    let l:object.bufnr = bufnr('%')
-    let l:object.winid = bufwinid('%')
-    let l:object.curfile = expand('%:p')
-    let l:object.curpos = getcurpos()
     let l:object.cmdline = a:cmdline
     let l:object.command = s:extract_cmdname(a:cmdline)
+    if a:0 > 0 && !empty(a:1)
+        let l:object.sbuffer = a:1
+    endif
 
     let l:object.messages = []
     let l:object.filtered = []
@@ -81,16 +77,8 @@ endfunction
 " Method: winback 
 " go back to the position before the command executed
 function! s:class.winback() dict abort
-    let l:winnr = bufwinnr(self.bufnr)
-    let [l:tabnr, l:winnr] = win_id2tabwin(self.winid)
-    if l:tabnr > 0 && l:winnr > 0
-        execute l:tabnr . 'tabnext'
-        execute l:winnr . 'wincmd w'
-    else
-        call s:find_main_window()
-    endif
-    if bufnr('%') ==  self.bufnr
-        call setpos('.', self.curpos)
+    if !empty(self.sbuffer)
+        call self.sbuffer.back_from()
     endif
 endfunction
 
@@ -126,22 +114,3 @@ function! s:extract_cmdname(cmdline) abort
     return ''
 endfunction
 
-" Func: s:find_main_window 
-function! s:find_main_window() abort
-    let l:wincount = winnr('$')
-    if l:wincount < 2
-        return
-    endif
-    let l:maxarea = 0
-    let l:mainwin = 0
-    for l:winnr in range(1, l:wincount)
-        let l:area = winwidth(l:winnr) * winheight(l:winnr)
-        if l:area > l:maxarea
-            let l:maxarea = l:area
-            let l:mainwin = l:winnr
-        endif
-    endfor
-    if l:mainwin > 0
-        execute l:mainwin . 'wincmd w'
-    endif
-endfunction
