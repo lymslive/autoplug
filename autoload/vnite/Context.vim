@@ -93,7 +93,7 @@ function! s:class.orindex(line) dict abort
         return a:line - 1
     endif
 
-    if a:line > self.filtered->len()
+    if a:line > len(self.filtered)
         return -1
     else
         return self.filtered[a:line-1]

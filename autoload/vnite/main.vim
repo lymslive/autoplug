@@ -59,8 +59,8 @@ function! vnite#main#run(bang, count, ...) abort
     let l:length = s:run_cmd(l:cmd, l:context)
     if l:length < 1
         return
-    elseif l:length == 1
-        echo l:content.messages[0]
+    elseif l:length == 1 && len(l:context.messages[0]) < 80
+        echo l:context.messages[0]
         return
     else
         let s:jLastContext = l:context
