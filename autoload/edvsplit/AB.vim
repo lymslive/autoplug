@@ -71,7 +71,7 @@ function! edvsplit#AB#FindAltFromPath(file, basepath, ...) " {{{1
 	" Lv2: directly sub dircetory
 	" echomsg "lookup in sub directory: "
 	let subpaths = edvsplit#AB#ListSubdirectory(path)
-	for i in range(1, len(subpaths)-1) 
+	for i in range(len(subpaths)) 
 		let subpath = subpaths[i]
 		" echomsg "lookup in sibling directory: " . subpath
 		let filefound = edvsplit#AB#FindAltInPath(a:file, subpath, extspec)
@@ -93,7 +93,7 @@ function! edvsplit#AB#FindAltFromPath(file, basepath, ...) " {{{1
 	" L4: sibling path
 	" echomsg "lookup in sibling directory: "
 	let sibpaths = edvsplit#AB#ListSubdirectory(parentpath)
-	for i in range(1, len(sibpaths)-1) 
+	for i in range(len(sibpaths)) 
 		let sibpath = sibpaths[i]
 		" echomsg "lookup in sibling directory: " . sibpath
 		if sibpath ==# path
@@ -119,14 +119,28 @@ endfunction
 " the returned list contain the basepath itself as the first item
 " refer to unix command find
 function! edvsplit#AB#ListSubdirectory(basepath) " {{{1
+    if has('WIN32')
+        return s:ListSubdirectory(a:basepath)
+    endif
 	let subpathstring = system('find ' . a:basepath . ' -maxdepth 1 -type d')
 	let subpaths = split(subpathstring, '\n')
 	return subpaths
 endfunction
 
+function! s:ListSubdirectory(basepath) " {{{1
+    let l:dicts = readdirex(a:basepath)
+    let l:subpaths = []
+    for l:entry in l:dicts
+        if l:entry.type ==? 'dir'
+            call add(l:subpaths, a:basepath . '/' . l:entry.name)
+        endif
+    endfor
+    return l:subpaths
+endfunction
+
 " find a alt file, from it's path or current path
 function! edvsplit#AB#FindAltFile(file, ...) " {{{1
-	if a:0 > 0
+    if a:0 > 0 && strlen(a:1) > 0
 		let extspec = a:1
 	else
 		let extspec = ""
@@ -134,9 +148,9 @@ function! edvsplit#AB#FindAltFile(file, ...) " {{{1
         if &filetype ==? 'c' || &filetype ==? 'cpp'
             let l:ext = fnamemodify(a:file, ':e')
             if l:ext =~? '^c'
-                let extspec = '.h'
+                let extspec = '.h*'
             elseif l:ext =~? '^h'
-                let extspec = '.c'
+                let extspec = '.c*'
             endif
         endif
 	endif
