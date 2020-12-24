@@ -12,7 +12,7 @@ let s:class.tail = 0
 function! vimloo#mrlist#new(capacity)
     let l:obj = deepcopy(s:class)
     let l:obj.capacity = a:capacity
-    let l:obj.array = repeat([''], a:this.capacity)
+    let l:obj.array = repeat([''], l:obj.capacity)
     let l:obj.head = -1
     let l:obj.tail = -1
     return l:obj
