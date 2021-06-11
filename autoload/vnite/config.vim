@@ -80,6 +80,14 @@ let g:vnite#config#start_toend = 0
 " after press <CR> to fire action, keep CM buffer open
 let g:vnite#config#keep_open = 0
 
+" Func: #linkcmd 
+" link a new custom command to predifined command(type), and add description
+function! vnite#config#linkcmd(command, cmdtype, desc) abort
+    let g:vnite#config#sharecmd[a:command] = a:cmdtype
+    let l:desc = a:command . ' |" ' . a:desc
+    call add(g:vnite#config#extracmdlist, l:desc)
+endfunction
+
 function! vnite#config#load() abort "{{{
     return 1
 endfunction "}}}

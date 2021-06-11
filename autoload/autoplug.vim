@@ -39,14 +39,12 @@ endfunction "}}}
 function! autoplug#complete(ArgLead, CmdLine, CursorPos) abort "{{{
     let l:lsGlob = glob(s:path . '/' . a:ArgLead . '*/', 0, 1)
     let l:lsGlob= map(l:lsGlob, 'fnamemodify(v:val, ":p:h:t")')
-    if s:path !=# expand('~/.vim/autoload')
-        let l:path = expand('~/.vim/autoload')
-        let l:lsMore = glob(l:path . '/' . a:ArgLead . '*/', 0, 1)
-        let l:lsMore = map(l:lsMore, 'fnamemodify(v:val, ":p:h:t")')
-        call extend(l:lsGlob, l:lsMore)
+    let l:sAutoHome = '~/.vim/autoload'
+    if has('win32') || has ('win64')
+        let l:sAutoHome = '~/vimfiles/autoload'
     endif
-    if has('WIN32')
-        let l:path = expand('~/vimfiles/autoload')
+    if s:path !=# expand(l:sAutoHome)
+        let l:path = expand(l:sAutoHome)
         let l:lsMore = glob(l:path . '/' . a:ArgLead . '*/', 0, 1)
         let l:lsMore = map(l:lsMore, 'fnamemodify(v:val, ":p:h:t")')
         call extend(l:lsGlob, l:lsMore)
