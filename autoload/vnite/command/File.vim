@@ -6,7 +6,7 @@
 
 let g:vnite#command#File#space = s:
 let s:project_marker = ['.git', '.svn', '.vim']
-let s:project_filelist = ['project.files', 'GFILES']
+let s:project_filelist = ['project.files', 'gtags.files']
 
 " :File [-r -a -g[expr]] [{path} | .]
 if !exists(':File')
