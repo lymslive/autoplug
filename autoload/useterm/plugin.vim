@@ -5,8 +5,8 @@
 " Modify: 2018-07-16
 
 if has('terminal')
-    " tnoremap <Esc><Esc> <C-\><C-N>
-    tnoremap <Esc> <C-\><C-N>
+    tnoremap <Esc><Esc> <C-\><C-N>
+    " tnoremap <Esc> <C-\><C-N>
     tnoremap <C-W>b <C-\><C-N><C-B>
     tnoremap <C-W>n <C-W>:tabnext<CR>
     tnoremap <C-W>N <C-W>:tabNext<CR>
@@ -46,8 +46,11 @@ function! useterm#plugin#load() abort "{{{
         cnoremap <buffer> <C-CR> <Home>Shell <End><CR>
         nnoremap <buffer> p :Shell <C-R>"
         nnoremap <buffer> s :Shell 
-        nnoremap <buffer> <CR> :Shell <C-R><C-W>
+        " nnoremap <buffer> <CR> :Shell <C-R><C-W>
+        nnoremap <buffer> <CR> :call useterm#shell#SmartEnter()<CR>
         vnoremap <buffer> <CR> y:Shell <C-R>=(visualmode() !=# 'v')? "" : getreg()<CR>
+
+        echo 'terminal shell buffer remap take effect!'
     endif
     return 0
 endfunction "}}}
