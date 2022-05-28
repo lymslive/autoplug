@@ -171,7 +171,9 @@ function! s:PressEnter() abort
         let l:file = l:lsMatch[1]
         let l:lineNo = l:lsMatch[2]
         let l:columnNo = l:lsMatch[3]
-        let l:file = l:pwd . '/' . l:file
+        if l:file[0] != '/'
+            let l:file = l:pwd . '/' . l:file
+        endif
         let l:ret = s:OpenFile(l:file, l:lineNo, l:columnNo)
         if l:ret
             return l:ret
