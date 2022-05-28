@@ -54,7 +54,7 @@ function! useterm#plugin#load() abort "{{{
         nnoremap <buffer> [[ :call search('\$ ', 'b')<CR>
         nnoremap <buffer> ]] :call search('\$ ', '')<CR>
 
-        nnoremap <buffer> ga :call term_sendkeys('', 'git add ' . expand('<cWORD>')<CR>i
+        nnoremap <buffer> ga :call term_sendkeys('', 'git add ' . expand('<cWORD>'))<CR>i
 
         echo 'terminal shell buffer remap take effect!'
     endif
