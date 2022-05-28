@@ -44,11 +44,17 @@ command! -nargs=+ MysqlExecute echo useterm#mysql#QuickExecute(<f-args>)
 function! useterm#plugin#load() abort "{{{
     if &buftype ==? 'terminal'
         cnoremap <buffer> <C-CR> <Home>Shell <End><CR>
-        nnoremap <buffer> p :Shell <C-R>"
+        nnoremap <buffer> p :call term_sendkeys('', getreg())<CR>i
+        vnoremap <buffer> p y:call term_sendkeys('', getreg())<CR>i
         nnoremap <buffer> s :Shell 
         " nnoremap <buffer> <CR> :Shell <C-R><C-W>
         nnoremap <buffer> <CR> :call useterm#shell#SmartEnter()<CR>
         vnoremap <buffer> <CR> y:Shell <C-R>=(visualmode() !=# 'v')? "" : getreg()<CR>
+
+        nnoremap <buffer> [[ :call search('\$ ', 'b')<CR>
+        nnoremap <buffer> ]] :call search('\$ ', '')<CR>
+
+        nnoremap <buffer> ga :call term_sendkeys('', 'git add ' . expand('<cWORD>')<CR>i
 
         echo 'terminal shell buffer remap take effect!'
     endif
