@@ -4,13 +4,24 @@
 " Create: 2018-08-01
 " Modify: 2018-08-01
 
+" TODO: change bash prompt as `bash@vim:~/path/to/pwd$ `
+" PS_SAVE=$PS1
+" PS1='\[\033[01;32m\]bash@vim\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+
 " SendShellCmd: 
 " send a cmd to an existed terminal shell or open a new one
 function! useterm#shell#SendShellCmd(bang, cmd) abort "{{{
+    let l:cmd = a:cmd
+    let l:bang = a:bang
+
     " save current window
-    if a:bang
+    if l:bang
         let l:tab = tabpagenr()
         let l:win = winnr()
+        if empty(l:cmd)
+            let l:cmd = 'cd ' . expand('%:p:h')
+            let l:bang = 0
+        endif
     endif
 
     let l:jobname = fnamemodify(&shell, ':t')
@@ -18,14 +29,14 @@ function! useterm#shell#SendShellCmd(bang, cmd) abort "{{{
     if empty(l:found)
         :terminal
     endif
-    if !empty(a:cmd) && a:cmd !~# '^\s*$'
-        call term_sendkeys('', a:cmd . "\<CR>")
+    if !empty(l:cmd) && l:cmd !~# '^\s*$'
+        call term_sendkeys('', l:cmd . "\<CR>")
         " into insert mode in terminal window, to redraw shell result
         normal! i
     endif
 
     " back to origin window
-    if a:bang
+    if l:bang
         if l:tab != 0 && l:tab != tabpagenr()
             execute l:tab . 'tabnext'
         endif
@@ -128,12 +139,39 @@ function! s:FindShellPwd() abort
     endif
 endfunction
 
+" Func: s:FindFile
+" find a readable file from current to parent dirctory, until up to root.
+" return empty string if fail
+function! s:FindFile(file) abort
+    let l:file = substitute(a:file, '^.*\s', '', 'g')
+    let l:pwd = s:FindShellPwd()
+    if empty(l:file) || empty(l:pwd)
+        return ''
+    endif
+    while !empty(l:pwd)
+        let l:path = l:pwd . '/'. l:file
+        if filereadable(l:path)
+            return l:path
+        endif
+        let l:lastslash = strridx(l:pwd, '/')
+        if l:lastslash < 0
+            break
+        endif
+        let l:pwd = strpart(l:pwd, 0, l:lastslash)
+    endwhile
+    return ''
+endfunction
+
 " Func: s:OpenFile 
 " try to open file in another window from terminal, option a:1 is file line
 " return 0 if file cannot open, 1 if succ
 function! s:OpenFile(file, ...) abort
-    if !filereadable(a:file)
-        return 0
+    let l:file = a:file
+    if !filereadable(l:file)
+        let l:file = s:FindFile(l:file)
+        if empty(l:file)
+            return 0
+        endif
     endif
     let l:cmd = ''
     if winnr('$') > 1
@@ -142,7 +180,7 @@ function! s:OpenFile(file, ...) abort
     else
         let l:cmd = 'split '
     endif
-    let l:cmd .= a:file
+    let l:cmd .= l:file
     execute l:cmd
     if a:0 > 0 && a:1 =~ '^\d\+$'
         execute a:1
@@ -164,9 +202,9 @@ function! s:PressEnter() abort
     let l:word = expand('<cword>')
     let l:Word = expand('<cWORD>')
 
-    " gcc make error line, eg:
+    " gcc or some other compile make error line, eg:
     " file:line:column
-    let l:lsMatch = matchlist(l:line, '^\([^:]\+\):\(\d\+\):\(\d\+\):')
+    let l:lsMatch = matchlist(l:line, '^\([^:]\+\):\(\d\+\):\(\d\+\)')
     if !empty(l:lsMatch)
         let l:file = l:lsMatch[1]
         let l:lineNo = l:lsMatch[2]

@@ -2,7 +2,7 @@
 " Author: lymslive
 " Description: use terminal tools
 " Create: 2018-07-16
-" Modify: 2018-07-16
+" Modify: 2023-04-12
 
 if has('terminal')
     tnoremap <Esc><Esc> <C-\><C-N>
@@ -23,12 +23,16 @@ if has('terminal')
 endif
 
 " Shell:
-" send shell command to a terminal shell, open a new one if no terminal
-" may from another tabpage and/or window
-" add `!` won't jump to the terminal window
+" send shell command to a terminal shell, open a new one if no terminal.
+" may switch to another tabpage and/or window, but
+" add `!` won't jump to the terminal window, actually jump back when done.
+" Without no argument, just switch to terminal, and `!` will jump to current
+" directory of editing buffer.
 command! -nargs=* -bang -complete=file Shell call useterm#shell#SendShellCmd(<bang>0, <q-args>)
+
 " ShellHere:
-" make the terminal cd to current file directory from which this cmd executed
+" make the terminal cd to current file directory from which this cmd executed.
+" behave the same as `:Shell!`
 command! -nargs=* ShellHere call useterm#shell#SendShellCmd(0, 'cd ' . expand('%:p:h'))
 
 " MysqlTable:
