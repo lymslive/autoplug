@@ -47,7 +47,7 @@ function! edvsplit#AB#FindAltInPath(file, path, ...) " {{{1
 endfunction
 
 " Find a altnative file in four relation places:
-"  selft, child, parent, sibling (no recursion)
+"  selft, child, parent, sibling (no recursion except 'include/' dir)
 "
 " IN/OUT argument refer to edvsplit#AB#FindAltInPath()
 function! edvsplit#AB#FindAltFromPath(file, basepath, ...) " {{{1
@@ -99,6 +99,9 @@ function! edvsplit#AB#FindAltFromPath(file, basepath, ...) " {{{1
 		if sibpath ==# path
 			continue
 		endif
+        if sibpath =~? 'include/\?$'
+            return edvsplit#AB#FindAltFromPath(a:file, sibpath, extspec)
+        endif
 		let filefound = edvsplit#AB#FindAltInPath(a:file, sibpath, extspec)
 		if strlen(filefound) > 0
 			" echomsg "find in sibling directory: " . filefound
