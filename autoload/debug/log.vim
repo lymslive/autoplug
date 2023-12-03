@@ -52,7 +52,7 @@ function! debug#log#command(notrace, msg, level, style) abort "{{{
 endfunction "}}}
 
 command! -nargs=+ -bang -count=0 LOG call debug#log#command(<bang>0, eval(<q-args>), <count>, 'Comment')
-command! -nargs=+ -bang ELOG call debug#log#command<bang>0, (eval(<q-args>), 0, 'ErrorMsg')
+command! -nargs=+ -bang ELOG call debug#log#command(<bang>0, eval(<q-args>), 0, 'ErrorMsg')
 command! -nargs=+ -bang DLOG call debug#log#command(<bang>0, eval(<q-args>), 1, 'WarningMsg')
 command! -nargs=+ -bang WLOG call debug#log#command(<bang>0, eval(<q-args>), 2, 'WarningMsg')
 command! -nargs=+ -bang -count=0 SLOG call debug#log#command(<bang>0, <q-args>, <count>, 'Comment')
