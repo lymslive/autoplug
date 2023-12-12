@@ -30,7 +30,7 @@ command! -nargs=* -count=0 T call usetabpg#func#jumpalt(<count>, <f-args>)
 " *gt* is mainly does the same thing as :T, in normal mode.
 " :help gt to see the default gt behavior
 nnoremap gt :call usetabpg#func#jumpalt()<CR>
-nnoremap gT :tabnew<CR>
+nnoremap gT :tabedit %:p<CR>
 if has('terminal')
     tnoremap <C-W>t <C-W>:call usetabpg#func#jumpalt()<CR>
 endif
